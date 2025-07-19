@@ -236,7 +236,6 @@
         ".github/copilot-instructions.md",
         ".cursorrules",
         ".cursor/rules/",
-        "CLAUDE.md",
         "CLAUDE.local.md",
         "opencode.md",
         "opencode.local.md",

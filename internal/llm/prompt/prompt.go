@@ -66,7 +66,7 @@ func processContextPaths(workDir string, paths []string) string {
 	// Track processed files to avoid duplicates
 	processedFiles := make(map[string]bool)
 	var processedMutex sync.Mutex
-
+	logging.Info("Processing context paths", "paths", paths)
 	for _, path := range paths {
 		wg.Add(1)
 		go func(p string) {
@@ -87,6 +87,8 @@ func processContextPaths(workDir string, paths []string) string {
 
 							if result := processFile(path); result != "" {
 								resultCh <- result
+								logging.Info("Adding context from file", "file", path, "result", result[:600])
+
 							}
 						} else {
 							processedMutex.Unlock()
@@ -107,6 +109,8 @@ func processContextPaths(workDir string, paths []string) string {
 					result := processFile(fullPath)
 					if result != "" {
 						resultCh <- result
+						logging.Info("Adding context from file", "file", fullPath, "result", result[:600])
+
 					}
 				} else {
 					processedMutex.Unlock()
