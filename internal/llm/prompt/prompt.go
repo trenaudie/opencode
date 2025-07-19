@@ -43,7 +43,11 @@ func GetAgentPrompt(agentName config.AgentName, provider models.ModelProvider) s
 	} else {
 		finalPrompt = basePrompt
 	}
-	logging.Info("returning the following base prompt : ", finalPrompt[:600])
+	maxLen := len(finalPrompt)
+	if maxLen > 600 {
+		maxLen = 600
+	}
+	logging.Info("returning the following base prompt : ", finalPrompt[:maxLen])
 	return finalPrompt
 }
 

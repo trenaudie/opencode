@@ -521,6 +521,10 @@ func WithReasoningEffort(effort string) OpenAIOption {
 // extractAgentName attempts to determine the agent name from the system message
 func (o *openaiClient) extractAgentName() config.AgentName {
 	sysMsg := strings.ToLower(o.providerOptions.systemMessage)
+	// Check for orchestrator first since it may also contain "code" words
+	if strings.Contains(sysMsg, "orchestrator") {
+		return config.AgentOrchestrator
+	}
 	if strings.Contains(sysMsg, "coder") || strings.Contains(sysMsg, "code") {
 		return config.AgentCoder
 	}

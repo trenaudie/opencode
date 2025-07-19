@@ -365,7 +365,6 @@ func setProviderDefaults() {
 	// OpenAI configuration
 	logging.Debug("Checking OpenAI configuration", "key", viper.GetString("providers.openai.apiKey"))
 	if key := viper.GetString("providers.openai.apiKey"); strings.TrimSpace(key) != "" {
-		logging.Info("Using OpenAI API key", "key", key)
 		viper.SetDefault("agents.coder.model", models.GPT41)
 		viper.SetDefault("agents.orchestrator.model", models.GPT41)
 		viper.SetDefault("agents.summarizer.model", models.GPT41)
