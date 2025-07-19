@@ -255,23 +255,52 @@ func setDefaults(debug bool) {
 func setProviderDefaults() {
 	// Set all API keys we can find in the environment
 	// Note: Viper does not default if the json apiKey is ""
+	logging.Debug("Setting default API keys from environment variables")
+	logging.Debug("anthropic apiKey", "key", os.Getenv("ANTHROPIC_API_KEY"))
+	logging.Debug("openai apiKey", "key", os.Getenv("OPENAI_API_KEY"))
+	logging.Debug("gemini apiKey", "key", os.Getenv("GEMINI_API_KEY"))
 	if apiKey := os.Getenv("ANTHROPIC_API_KEY"); apiKey != "" {
 		viper.SetDefault("providers.anthropic.apiKey", apiKey)
+		// If config file has empty apiKey, override it with environment variable
+		if viper.GetString("providers.anthropic.apiKey") == "" {
+			viper.Set("providers.anthropic.apiKey", apiKey)
+		}
 	}
 	if apiKey := os.Getenv("OPENAI_API_KEY"); apiKey != "" {
 		viper.SetDefault("providers.openai.apiKey", apiKey)
+		// If config file has empty apiKey, override it with environment variable
+		if viper.GetString("providers.openai.apiKey") == "" {
+			viper.Set("providers.openai.apiKey", apiKey)
+		}
+		logging.Debug("Set OpenAI API key in viper", "key", viper.GetString("providers.openai.apiKey"))
 	}
 	if apiKey := os.Getenv("GEMINI_API_KEY"); apiKey != "" {
 		viper.SetDefault("providers.gemini.apiKey", apiKey)
+		// If config file has empty apiKey, override it with environment variable
+		if viper.GetString("providers.gemini.apiKey") == "" {
+			viper.Set("providers.gemini.apiKey", apiKey)
+		}
 	}
 	if apiKey := os.Getenv("GROQ_API_KEY"); apiKey != "" {
 		viper.SetDefault("providers.groq.apiKey", apiKey)
+		// If config file has empty apiKey, override it with environment variable
+		if viper.GetString("providers.groq.apiKey") == "" {
+			viper.Set("providers.groq.apiKey", apiKey)
+		}
 	}
 	if apiKey := os.Getenv("OPENROUTER_API_KEY"); apiKey != "" {
 		viper.SetDefault("providers.openrouter.apiKey", apiKey)
+		// If config file has empty apiKey, override it with environment variable
+		if viper.GetString("providers.openrouter.apiKey") == "" {
+			viper.Set("providers.openrouter.apiKey", apiKey)
+		}
 	}
 	if apiKey := os.Getenv("XAI_API_KEY"); apiKey != "" {
 		viper.SetDefault("providers.xai.apiKey", apiKey)
+		// If config file has empty apiKey, override it with environment variable
+		if viper.GetString("providers.xai.apiKey") == "" {
+			viper.Set("providers.xai.apiKey", apiKey)
+		}
 	}
 	if apiKey := os.Getenv("AZURE_OPENAI_ENDPOINT"); apiKey != "" {
 		// api-key may be empty when using Entra ID credentials – that's okay
@@ -283,7 +312,6 @@ func setProviderDefaults() {
 			viper.Set("providers.copilot.apiKey", apiKey)
 		}
 	}
-
 	// Use this order to set the default models
 	// 1. Copilot
 	// 2. Anthropic
@@ -314,7 +342,9 @@ func setProviderDefaults() {
 	}
 
 	// OpenAI configuration
+	logging.Debug("Checking OpenAI configuration", "key", viper.GetString("providers.openai.apiKey"))
 	if key := viper.GetString("providers.openai.apiKey"); strings.TrimSpace(key) != "" {
+		logging.Info("Using OpenAI API key", "key", key)
 		viper.SetDefault("agents.coder.model", models.GPT41)
 		viper.SetDefault("agents.summarizer.model", models.GPT41)
 		viper.SetDefault("agents.task.model", models.GPT41Mini)
@@ -383,6 +413,14 @@ func setProviderDefaults() {
 		viper.SetDefault("agents.task.model", models.VertexAIGemini25Flash)
 		viper.SetDefault("agents.title.model", models.VertexAIGemini25Flash)
 		return
+	}
+
+	// Assert that OPENAI_API_KEY is set as fallback and properly loaded into viper
+	if os.Getenv("OPENAI_API_KEY") == "" {
+		panic("OPENAI_API_KEY must be set when no other provider is configured")
+	}
+	if viper.GetString("providers.openai.apiKey") == "" {
+		panic("OPENAI API KEY incorrectly loaded into Viper")
 	}
 }
 
@@ -695,6 +733,7 @@ func setDefaultModelForAgent(agent AgentName) bool {
 	}
 
 	if apiKey := os.Getenv("OPENAI_API_KEY"); apiKey != "" {
+		logging.Info("using OpenAI API key for agent", "agent", agent)
 		var model models.ModelID
 		maxTokens := int64(5000)
 		reasoningEffort := ""
@@ -720,6 +759,8 @@ func setDefaultModelForAgent(agent AgentName) bool {
 			ReasoningEffort: reasoningEffort,
 		}
 		return true
+	} else {
+		logging.Debug("l.702 no openAI api key found for agent", "agent", agent)
 	}
 
 	if apiKey := os.Getenv("OPENROUTER_API_KEY"); apiKey != "" {

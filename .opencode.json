@@ -16,7 +16,6 @@
   },
     "providers": {
       "openai": {
-        "apiKey": "${OPENAI_API_KEY}",
         "disabled": false
       }
     },
