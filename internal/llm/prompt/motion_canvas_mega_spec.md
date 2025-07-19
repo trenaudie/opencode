@@ -106,21 +106,52 @@
 
   "animationFlow": [
     // Each animation step or phase as an object (order in array = time order in scene)
-    {
-      "step": "number|string",
-      "type": "sequential|parallel|staggered|wait|custom",
-      "target": "string|array|null",                     // Object(s) acted upon (often by 'ref')
-      "property": "string|array|null",                   // Animated property(ies)
-      "from": "value|object|null",
-      "to": "value|object|null",
-      "duration": "number|null",                         // In seconds if present
-      "easing": "string|null",
-      "animationFn": "tween|all|waitFor|edit|insert|remove|selection|custom|null",
-      "action": "string|null",                           // Plaintext summary of "what happens"
-      "details": "object|string|null",                   // Extra details: pausing, method calls, value calcs.
-      "concurrency": "sequential|parallel|staggered|null"
-    }
-    // ...sequence continues per scene animation script
+  {
+    "step": "number|string",             // Sequence order or phase
+    "type": "tween|spring|wait|custom",  // MC animation type
+
+    // Targets
+    "target": "string|array|null",       // Reference/name(s) of animated object(s)
+    "property": "string|array|null",     // 'x', 'fill', ['x','y'], 'fillColor', etc
+
+    // Value transitions
+    "from": "number|string|array|object|null",   // Start value(s)
+    "to": "number|string|array|object|null",     // End value(s)
+    "startValue": "number|string|array|object|null", // Alias for compatibility
+    "endValue": "number|string|array|object|null",
+
+    // Duration / time
+    "duration": "number|null",            // In seconds (support float/duration/named)
+    "timingFunction": "string|null",      // Easing, 'easeInOutCubic' etc. Also can specify for springs.
+    "easing": "string|null",              // Alias for compatibility
+    "springType": "string|null",          // For spring animation ('PlopSpring', 'SmoothSpring', etc)
+
+    // Tween/step logic
+    "mapping": "string|null",             // e.g., 'map(start, end, easeFn(value))'
+    "stepLogic": "string|object|null",    // Human summary, or actual mapped MC code for value updating
+    "animationFn": "tween|spring|waitFor|edit|all|map|custom|null", // Explicit function if significant
+    "call": "string|null",                // If 'callable', e.g., how the tween or spring is used
+
+    // Control/concurrency
+    "concurrency": "single|parallel|sequential|staggered|grouped|none|null", // Execution relation
+    "runs": "description of sequence or concurrency",
+    "order": "number|string|null",
+
+    // Functional or advanced options
+    "tweenCallback": "string|object|null",   // If a callback is used for custom value mapping in tween
+    "easingCurve": "string|array|null",      // e.g. [custom array] if applicable
+    "delays": "array|number|null",           // For staggered/concurrent tweens
+    "labelsOrComments": "array|string|null", // Timeline comments, labels, debug highlights, as present
+
+    // Waits and pauses
+    "wait": "number|null",                   // Pause after/before, in seconds
+    "waitType": "waitFor|yield|custom|null", // To clarify wait style if ambiguous
+
+    // Additional
+    "action": "string|null",                 // Human description ("fade out", "move left", etc)
+    "details": "object|string|null",         // Any other MC-specific tweak, mapping, additional callback info.
+    "notes": "string|null"                   // Freeform for implementer ("spring reverses direction", etc)
+  }
   ],
 
   "signalsAndEffects": [
