@@ -25,18 +25,19 @@ func OrchestratorAgentTools(
 	}
 	return append(
 		[]tools.BaseTool{
-			tools.NewBashTool(permissions),
+			// tools.NewBashTool(permissions),
 			tools.NewEditTool(lspClients, permissions, history),
-			tools.NewFetchTool(permissions),
-			tools.NewGlobTool(),
-			tools.NewGrepTool(),
-			tools.NewLsTool(),
-			tools.NewSourcegraphTool(),
+			// tools.NewFetchTool(permissions),
+			// tools.NewGlobTool(),
+			// tools.NewGrepTool(),
+			// tools.NewLsTool(),
+			// tools.NewSourcegraphTool(),
 			tools.NewViewTool(lspClients),
-			tools.NewPatchTool(lspClients, permissions, history),
+			// tools.NewPatchTool(lspClients, permissions, history),
 			tools.NewWriteTool(lspClients, permissions, history),
 			tools.NewLucidIconsTool(),
-			NewAgentTool(sessions, messages, lspClients),
+			// NewAgentTool(sessions, messages, lspClients),
+			NewCoderAgentTool(sessions, messages, lspClients),
 		}, otherTools...,
 	)
 }

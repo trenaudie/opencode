@@ -96,6 +96,63 @@ func (b *agentTool) Run(ctx context.Context, call tools.ToolCall) (tools.ToolRes
 	return tools.NewTextResponse(response.Content().String()), nil
 }
 
+func (b *agentTool) RunBackup(ctx context.Context, call tools.ToolCall) (tools.ToolResponse, error) {
+	// backing up the agnet run with the AgentTool prompt
+	var params AgentParams
+	if err := json.Unmarshal([]byte(call.Input), &params); err != nil {
+		return tools.NewTextErrorResponse(fmt.Sprintf("error parsing parameters: %s", err)), nil
+	}
+	if params.Prompt == "" {
+		return tools.NewTextErrorResponse("prompt is required"), nil
+	}
+
+	sessionID, messageID := tools.GetContextValues(ctx)
+	if sessionID == "" || messageID == "" {
+		return tools.ToolResponse{}, fmt.Errorf("session_id and message_id are required")
+	}
+
+	agent, err := NewAgent(config.AgentTask, b.sessions, b.messages, TaskAgentTools(b.lspClients))
+	if err != nil {
+		return tools.ToolResponse{}, fmt.Errorf("error creating agent: %s", err)
+	}
+
+	session, err := b.sessions.CreateTaskSession(ctx, call.ID, sessionID, "New Agent Session")
+	if err != nil {
+		return tools.ToolResponse{}, fmt.Errorf("error creating session: %s", err)
+	}
+
+	done, err := agent.Run(ctx, session.ID, params.Prompt)
+	if err != nil {
+		return tools.ToolResponse{}, fmt.Errorf("error generating agent: %s", err)
+	}
+	result := <-done
+	if result.Error != nil {
+		return tools.ToolResponse{}, fmt.Errorf("error generating agent: %s", result.Error)
+	}
+
+	response := result.Message
+	if response.Role != message.Assistant {
+		return tools.NewTextErrorResponse("no response"), nil
+	}
+
+	updatedSession, err := b.sessions.Get(ctx, session.ID)
+	if err != nil {
+		return tools.ToolResponse{}, fmt.Errorf("error getting session: %s", err)
+	}
+	parentSession, err := b.sessions.Get(ctx, sessionID)
+	if err != nil {
+		return tools.ToolResponse{}, fmt.Errorf("error getting parent session: %s", err)
+	}
+
+	parentSession.Cost += updatedSession.Cost
+
+	_, err = b.sessions.Save(ctx, parentSession)
+	if err != nil {
+		return tools.ToolResponse{}, fmt.Errorf("error saving parent session: %s", err)
+	}
+	return tools.NewTextResponse(response.Content().String()), nil
+}
+
 func NewAgentTool(
 	Sessions session.Service,
 	Messages message.Service,

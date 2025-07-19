@@ -14,7 +14,10 @@ import (
 
 func GetAgentPrompt(agentName config.AgentName, provider models.ModelProvider) string {
 	basePrompt := ""
+	logging.Info("getting agent prompt for agent name : ", agentName)
 	switch agentName {
+	case config.AgentOrchestrator:
+		basePrompt = OrchestratorPrompt()
 	case config.AgentCoder:
 		basePrompt = CoderPrompt(provider)
 	case config.AgentTitle:
@@ -27,14 +30,21 @@ func GetAgentPrompt(agentName config.AgentName, provider models.ModelProvider) s
 		basePrompt = "You are a helpful assistant"
 	}
 
-	if agentName == config.AgentCoder || agentName == config.AgentTask {
+	var finalPrompt string
+	if agentName == config.AgentCoder || agentName == config.AgentTask || agentName == config.AgentOrchestrator {
 		// Add context from project-specific instruction files if they exist
 		contextContent := getContextFromPaths()
+		logging.Info("retrieved ", len(contextContent), " characters of context")
 		if contextContent != "" {
-			return fmt.Sprintf("%s\n\n# Project-Specific Context\n Make sure to follow the instructions in the context below\n%s", basePrompt, contextContent)
+			finalPrompt = fmt.Sprintf("%s\n\n# Project-Specific Context\n Make sure to follow the instructions in the context below\n%s", basePrompt, contextContent)
+		} else {
+			finalPrompt = basePrompt
 		}
+	} else {
+		finalPrompt = basePrompt
 	}
-	return basePrompt
+	logging.Info("returning the following base prompt : ", finalPrompt[:600])
+	return finalPrompt
 }
 
 var (

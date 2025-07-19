@@ -202,12 +202,22 @@ func (o *openaiClient) send(ctx context.Context, messages []message.Message, too
 		logging.Info("Making OpenAI API call", "model", o.providerOptions.model.APIModel, "attempt", attempts, "system_prompt_length", len(o.providerOptions.systemMessage))
 		// Log system prompt and input to files
 		agentName := o.extractAgentName()
-		logging.LogSystemPrompt(agentName, o.providerOptions.systemMessage)
-		
+		logging.LogSystemPrompt(string(agentName), o.providerOptions.systemMessage)
+
 		// Log input content
 		inputContent := o.extractInputContent(messages)
-		logging.LogInput(agentName, inputContent)
-		
+		logging.LogInput(string(agentName), inputContent, o.providerOptions.systemMessage)
+
+		// Prepare input data for agent call logging
+		inputData := map[string]interface{}{
+			"model":                o.providerOptions.model.APIModel,
+			"system_prompt_length": len(o.providerOptions.systemMessage),
+			"messages_count":       len(messages),
+			"tools_count":          len(tools),
+			"max_tokens":           o.providerOptions.maxTokens,
+			"attempt":              attempts,
+		}
+
 		for _, msg := range messages {
 			logging.Info("Processing message", "role", msg.Role, "content_length", len(msg.Content().Text), "tool_calls_count", len(msg.ToolCalls()), "tool_results_count", len(msg.ToolResults()))
 		}
@@ -252,7 +262,18 @@ func (o *openaiClient) send(ctx context.Context, messages []message.Message, too
 		}
 
 		// Log output content and tool calls
-		logging.LogOutput(agentName, content, toolCalls)
+		logging.LogOutput(string(agentName), content, toolCalls)
+
+		// Prepare output data for agent call logging
+		outputData := map[string]interface{}{
+			"content_length":   len(content),
+			"finish_reason":    string(openaiResponse.Choices[0].FinishReason),
+			"tool_calls_count": len(toolCalls),
+			"usage":            o.usage(*openaiResponse),
+		}
+
+		// Log the complete agent call
+		logging.LogAgentCall(string(agentName), "openai_api_call", inputData, outputData)
 
 		return &ProviderResponse{
 			Content:      content,
@@ -285,12 +306,23 @@ func (o *openaiClient) stream(ctx context.Context, messages []message.Message, t
 			logging.Info("Making OpenAI API call", "model", o.providerOptions.model.APIModel, "attempt", attempts, "system_prompt_length", len(o.providerOptions.systemMessage))
 			// Log system prompt and input to files
 			agentName := o.extractAgentName()
-			logging.LogSystemPrompt(agentName, o.providerOptions.systemMessage)
-			
+			logging.LogSystemPrompt(string(agentName), o.providerOptions.systemMessage)
+
 			// Log input content
 			inputContent := o.extractInputContent(messages)
-			logging.LogInput(agentName, inputContent)
-			
+			logging.LogInput(string(agentName), inputContent, o.providerOptions.systemMessage)
+
+			// Prepare input data for agent call logging (streaming)
+			inputData := map[string]interface{}{
+				"model":                o.providerOptions.model.APIModel,
+				"system_prompt_length": len(o.providerOptions.systemMessage),
+				"messages_count":       len(messages),
+				"tools_count":          len(tools),
+				"max_tokens":           o.providerOptions.maxTokens,
+				"attempt":              attempts,
+				"streaming":            true,
+			}
+
 			for _, msg := range messages {
 				logging.Info("Processing streaming message", "role", msg.Role, "content_length", len(msg.Content().Text), "tool_calls_count", len(msg.ToolCalls()), "tool_results_count", len(msg.ToolResults()))
 			}
@@ -339,7 +371,19 @@ func (o *openaiClient) stream(ctx context.Context, messages []message.Message, t
 				logging.Info("OpenAI streaming API call completed", "content_length", len(currentContent), "finish_reason", finishReason, "tool_calls_count", len(toolCalls))
 
 				// Log output content and tool calls
-				logging.LogOutput(agentName, currentContent, toolCalls)
+				logging.LogOutput(string(agentName), currentContent, toolCalls)
+
+				// Prepare output data for agent call logging (streaming)
+				outputData := map[string]interface{}{
+					"content_length":   len(currentContent),
+					"finish_reason":    string(acc.ChatCompletion.Choices[0].FinishReason),
+					"tool_calls_count": len(toolCalls),
+					"usage":            o.usage(acc.ChatCompletion),
+					"streaming":        true,
+				}
+
+				// Log the complete agent call (streaming)
+				logging.LogAgentCall(string(agentName), "openai_streaming_api_call", inputData, outputData)
 
 				eventChan <- ProviderEvent{
 					Type: EventComplete,
@@ -495,7 +539,7 @@ func (o *openaiClient) extractAgentName() config.AgentName {
 // extractInputContent combines all user messages into a single input string for logging
 func (o *openaiClient) extractInputContent(messages []message.Message) string {
 	var inputParts []string
-	
+
 	for _, msg := range messages {
 		switch msg.Role {
 		case message.User:
@@ -508,6 +552,6 @@ func (o *openaiClient) extractInputContent(messages []message.Message) string {
 			}
 		}
 	}
-	
+
 	return strings.Join(inputParts, "\n\n")
 }

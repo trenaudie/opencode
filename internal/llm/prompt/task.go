@@ -13,5 +13,5 @@ Notes:
 2. When relevant, share file names and code snippets relevant to the query
 3. Any file paths you return in your final response MUST be absolute. DO NOT use relative paths.`
 
-	return fmt.Sprintf("%s\n%s\n", agentPrompt, getEnvironmentInfo())
+	return fmt.Sprintf("%s\n%s\n", agentPrompt)
 }

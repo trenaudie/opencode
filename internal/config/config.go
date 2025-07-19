@@ -119,7 +119,7 @@ var defaultContextPaths = []string{
 	// "OPENCODE.md",
 	// "OPENCODE.local.md",
 	"MotionCanvasGuidelines.md",
-	// "MotionCanvasExamples.md", they are kept for the coder agent though
+	"internal/llm/prompt/motion_canvas_mega_spec.md",
 }
 
 // getDefaultContextPaths returns the default context paths with Motion Canvas examples added
@@ -127,18 +127,18 @@ func getDefaultContextPaths(workingDir string) []string {
 	paths := make([]string, len(defaultContextPaths))
 	copy(paths, defaultContextPaths)
 
-	// Add Motion Canvas example files
-	scenesDir := filepath.Join(workingDir, "frontend/src/scenes2")
-	if _, err := os.Stat(scenesDir); err == nil {
-		files, err := os.ReadDir(scenesDir)
-		if err == nil {
-			for _, file := range files {
-				if !file.IsDir() && filepath.Ext(file.Name()) == ".tsx" {
-					paths = append(paths, filepath.Join("frontend/src/scenes2", file.Name()))
-				}
-			}
-		}
-	}
+	// // Add Motion Canvas example files. REMOVE SINCE we now have the mega spec
+	// scenesDir := filepath.Join(workingDir, "frontend/src/scenes2")
+	// if _, err := os.Stat(scenesDir); err == nil {
+	// 	files, err := os.ReadDir(scenesDir)
+	// 	if err == nil {
+	// 		for _, file := range files {
+	// 			if !file.IsDir() && filepath.Ext(file.Name()) == ".tsx" {
+	// 				paths = append(paths, filepath.Join("frontend/src/scenes2", file.Name()))
+	// 			}
+	// 		}
+	// 	}
+	// }
 
 	return paths
 }
