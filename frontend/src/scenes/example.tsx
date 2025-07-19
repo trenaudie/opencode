@@ -1,70 +1,63 @@
-import {makeScene2D, Circle} from '@motion-canvas/2d';
-import {all, createRef} from '@motion-canvas/core';
+import { makeScene2D, Rect, Circle } from '@motion-canvas/2d';
+import { all, createRef } from '@motion-canvas/core';
+
+import { createSignal, createEffect } from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
-  const myCircle = createRef<Circle>();
+  view.fill('#000000');
+  const square = createRef<Circle>();
+
+  // Signals for position
+  const radius = 200;
+  const numFrames = 120;
+  const angle = createSignal(0);
+  const x = createSignal(0);
+  const y = createSignal(0);
+
+  view.add(
+    <Circle
+      ref={square}
+      width={140} height={140}
+      fill="#0000FF"
+    />
+  );
+
+  // Computing the position using effect
+  createEffect(() => {
+    const currentAngle = angle();
+    x(radius * Math.cos(currentAngle));
+    y(radius * Math.sin(currentAngle));
+  });
+
+  // Animate the circle to move in a circular path
+  for (let frame = 0; frame <= numFrames; frame++) {
+    yield* all(
+      angle((Math.PI * 2 * frame) / numFrames, 0.1)
+    );
+    yield* square().position(x(), y(), 1);
+  }
+});
+  const square = createRef<Circle>();
   view.fill('#000000');
   view.add(
     <Circle
-      ref={myCircle}
-      // Add first circle and set its properties:
-      x={-300}
-      width={140}
-      height={140}
-      fill="#e13238"
-    />, 
-  );
-
-    // Add second circle (new) and set its properties:
-  const secondCircle = createRef<Circle>();
-  view.add(
-    <Circle
-      ref={secondCircle}
-      x={300}
-      width={140}
-      height={140}
-      fill="#38e132"
-    />, 
-  );
-
-  // Add third circle (new) and set its properties:
-  const thirdCircle = createRef<Circle>();
-  view.add(
-    <Circle
-      ref={thirdCircle}
+      ref={square}
       x={0}
-      width={140}
-      height={140}
-      fill="#32a8e1"
-    />, 
+      width={140} height={140}
+      fill="#0000FF"
+    />
   );
 
-  yield* all(
-    myCircle().position.x(300, 1).to(-300, 1),
-    myCircle().fill('#e6a700', 1).to('#e13238', 1),
-    secondCircle().position.x(-300, 1).to(300, 1),
-    secondCircle().fill('#e13238', 1).to('#e6a700', 1),
-    // Third Circle Animation
-    thirdCircle().position.y(-300, 1).to(300, 1),
-  );
-  thirdCircle().fill('#e1e200', 1).to('#32a8e1', 1)
-  );
+  // Define the circle's movement parameters
+  const radius = 200;
+  const numFrames = 120;
+  let angle = 0;
 
-  const secondCircle = createRef<Circle>();
-  view.add(
-    <Circle
-      ref={secondCircle}
-      x={300}
-      width={140}
-      height={140}
-      fill="#38e132"
-    />, 
-  );
-
-  yield* all(
-    myCircle().position.x(300, 1).to(-300, 1),
-    myCircle().fill('#e6a700', 1).to('#e13238', 1),
-    secondCircle().position.x(-300, 1).to(300, 1),
-    secondCircle().fill('#e13238', 1).to('#e6a700', 1),
-  );
+  // Animate the circle to move in a circular path
+  while (angle <= Math.PI * 2) {
+    const x = radius * Math.cos(angle);
+    const y = radius * Math.sin(angle);
+    yield* square().position(x, y, 1);
+    angle += Math.PI * 2 / numFrames;
+  }
 });

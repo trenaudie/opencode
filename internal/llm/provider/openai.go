@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/openai/openai-go"
@@ -196,7 +197,17 @@ func (o *openaiClient) send(ctx context.Context, messages []message.Message, too
 	attempts := 0
 	for {
 		attempts++
-		logging.Info("Making OpenAI API call", "model", o.providerOptions.model.APIModel, "system_prompt", o.providerOptions.systemMessage[0:2000]+"....", "attempt", attempts, "system_prompt_length", len(o.providerOptions.systemMessage))
+		// logging.Info("Making OpenAI API call", "model", o.providerOptions.model.APIModel, "system_prompt", o.providerOptions.systemMessage[:1000]+"...."+o.providerOptions.systemMessage[len(o.providerOptions.systemMessage)-1000:], "attempt", attempts, "system_prompt_length", len(o.providerOptions.systemMessage))
+
+		logging.Info("Making OpenAI API call", "model", o.providerOptions.model.APIModel, "attempt", attempts, "system_prompt_length", len(o.providerOptions.systemMessage))
+		// Log system prompt and input to files
+		agentName := o.extractAgentName()
+		logging.LogSystemPrompt(agentName, o.providerOptions.systemMessage)
+		
+		// Log input content
+		inputContent := o.extractInputContent(messages)
+		logging.LogInput(agentName, inputContent)
+		
 		for _, msg := range messages {
 			logging.Info("Processing message", "role", msg.Role, "content_length", len(msg.Content().Text), "tool_calls_count", len(msg.ToolCalls()), "tool_results_count", len(msg.ToolResults()))
 		}
@@ -240,6 +251,9 @@ func (o *openaiClient) send(ctx context.Context, messages []message.Message, too
 			finishReason = message.FinishReasonToolUse
 		}
 
+		// Log output content and tool calls
+		logging.LogOutput(agentName, content, toolCalls)
+
 		return &ProviderResponse{
 			Content:      content,
 			ToolCalls:    toolCalls,
@@ -267,7 +281,16 @@ func (o *openaiClient) stream(ctx context.Context, messages []message.Message, t
 	go func() {
 		for {
 			attempts++
-			logging.Info("Making OpenAI streaming API call", "model", o.providerOptions.model.APIModel, "attempt", attempts, "system_prompt", o.providerOptions.systemMessage[0:2000]+"....", "system_prompt_length", len(o.providerOptions.systemMessage))
+			// logging.Info("Making OpenAI streaming API call", "model", o.providerOptions.model.APIModel, "attempt", attempts, "system_prompt", o.providerOptions.systemMessage[:1000]+"...."+o.providerOptions.systemMessage[len(o.providerOptions.systemMessage)-1000:], "system_prompt_length", len(o.providerOptions.systemMessage))
+			logging.Info("Making OpenAI API call", "model", o.providerOptions.model.APIModel, "attempt", attempts, "system_prompt_length", len(o.providerOptions.systemMessage))
+			// Log system prompt and input to files
+			agentName := o.extractAgentName()
+			logging.LogSystemPrompt(agentName, o.providerOptions.systemMessage)
+			
+			// Log input content
+			inputContent := o.extractInputContent(messages)
+			logging.LogInput(agentName, inputContent)
+			
 			for _, msg := range messages {
 				logging.Info("Processing streaming message", "role", msg.Role, "content_length", len(msg.Content().Text), "tool_calls_count", len(msg.ToolCalls()), "tool_results_count", len(msg.ToolResults()))
 			}
@@ -314,6 +337,9 @@ func (o *openaiClient) stream(ctx context.Context, messages []message.Message, t
 				}
 
 				logging.Info("OpenAI streaming API call completed", "content_length", len(currentContent), "finish_reason", finishReason, "tool_calls_count", len(toolCalls))
+
+				// Log output content and tool calls
+				logging.LogOutput(agentName, currentContent, toolCalls)
 
 				eventChan <- ProviderEvent{
 					Type: EventComplete,
@@ -446,4 +472,42 @@ func WithReasoningEffort(effort string) OpenAIOption {
 		}
 		options.reasoningEffort = defaultReasoningEffort
 	}
+}
+
+// extractAgentName attempts to determine the agent name from the system message
+func (o *openaiClient) extractAgentName() config.AgentName {
+	sysMsg := strings.ToLower(o.providerOptions.systemMessage)
+	if strings.Contains(sysMsg, "coder") || strings.Contains(sysMsg, "code") {
+		return config.AgentCoder
+	}
+	if strings.Contains(sysMsg, "title") {
+		return config.AgentTitle
+	}
+	if strings.Contains(sysMsg, "summariz") {
+		return config.AgentSummarizer
+	}
+	if strings.Contains(sysMsg, "task") {
+		return config.AgentTask
+	}
+	return "unknown"
+}
+
+// extractInputContent combines all user messages into a single input string for logging
+func (o *openaiClient) extractInputContent(messages []message.Message) string {
+	var inputParts []string
+	
+	for _, msg := range messages {
+		switch msg.Role {
+		case message.User:
+			if content := msg.Content().String(); content != "" {
+				inputParts = append(inputParts, fmt.Sprintf("User: %s", content))
+			}
+		case message.Tool:
+			for _, result := range msg.ToolResults() {
+				inputParts = append(inputParts, fmt.Sprintf("Tool Result (%s): %s", result.ToolCallID, result.Content))
+			}
+		}
+	}
+	
+	return strings.Join(inputParts, "\n\n")
 }

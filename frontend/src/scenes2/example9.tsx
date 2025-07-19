@@ -1,7 +1,6 @@
 import {Circle, makeScene2D, Path, Rect} from '@motion-canvas/2d';
 import {createRef} from '@motion-canvas/core';
 import {Node} from '@motion-canvas/2d';
-import {logMethods} from './utils';
 import {all, waitFor} from '@motion-canvas/core';
 import {Layout} from '@motion-canvas/2d';
 export default makeScene2D(function* (view) {

@@ -72,7 +72,9 @@ func TestGenerateSceneEndpointValidation(t *testing.T) {
 	// Add a test version that doesn't require full app initialization
 	r.Post("/generateScene", func(w http.ResponseWriter, r *http.Request) {
 		// Parse JSON request
-		var req ChatRequest
+		var req struct {
+			Prompt string `json:"prompt"`
+		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "Invalid JSON", http.StatusBadRequest)
 			return

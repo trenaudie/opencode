@@ -237,6 +237,11 @@ func main() {
 	})
 
 	logging.InitGlobalLogging("app.log")
+	
+	// Initialize system prompt logging directory (cleans on restart)
+	if err := logging.InitSystemPromptLogging(); err != nil {
+		logging.Error("Failed to initialize system prompt logging", "error", err)
+	}
 
 	// Initialize app
 	logging.Info("Initializing application context")

@@ -11,7 +11,7 @@ import (
 	"github.com/opencode-ai/opencode/internal/session"
 )
 
-func CoderAgentTools(
+func OrchestratorAgentTools(
 	permissions permission.Service,
 	sessions session.Service,
 	messages message.Service,
@@ -35,9 +35,20 @@ func CoderAgentTools(
 			tools.NewViewTool(lspClients),
 			tools.NewPatchTool(lspClients, permissions, history),
 			tools.NewWriteTool(lspClients, permissions, history),
+			tools.NewLucidIconsTool(),
 			NewAgentTool(sessions, messages, lspClients),
 		}, otherTools...,
 	)
+}
+
+func CoderAgentTools(
+	permissions permission.Service,
+	sessions session.Service,
+	messages message.Service,
+	history history.Service,
+	lspClients map[string]*lsp.Client,
+) []tools.BaseTool {
+	return []tools.BaseTool{}
 }
 
 func TaskAgentTools(lspClients map[string]*lsp.Client) []tools.BaseTool {

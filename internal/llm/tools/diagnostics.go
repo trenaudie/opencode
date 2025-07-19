@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"maps"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/opencode-ai/opencode/internal/config"
 	"github.com/opencode-ai/opencode/internal/lsp"
 	"github.com/opencode-ai/opencode/internal/lsp/protocol"
 )
@@ -155,6 +157,9 @@ func hasDiagnosticsChanged(current, original map[protocol.DocumentUri][]protocol
 }
 
 func getDiagnostics(filePath string, lsps map[string]*lsp.Client) string {
+	if filePath != filepath.Join(config.WorkingDirectory(), "frontend/src/scenes/example.tsx") {
+		panic("Diagnostics tool only works with example.tsx for now")
+	}
 	fileDiagnostics := []string{}
 	projectDiagnostics := []string{}
 

@@ -47,3 +47,7 @@
   6. **OUTPUT**
     (CRITICAL) 
     You must ultimately output the written .tsx file to the frontend/src/scenes/example.tsx file. It already exists, but you must call the tool to edit it. 
+
+I will provide you some exmaples of Motion Canvas Code, for you to see the syntax and these guidelines in practice. 
+
+EXAMPLES :

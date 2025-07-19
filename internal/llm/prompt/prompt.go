@@ -30,7 +30,6 @@ func GetAgentPrompt(agentName config.AgentName, provider models.ModelProvider) s
 	if agentName == config.AgentCoder || agentName == config.AgentTask {
 		// Add context from project-specific instruction files if they exist
 		contextContent := getContextFromPaths()
-		logging.Debug("Context content", "Context", contextContent)
 		if contextContent != "" {
 			return fmt.Sprintf("%s\n\n# Project-Specific Context\n Make sure to follow the instructions in the context below\n%s", basePrompt, contextContent)
 		}
@@ -87,8 +86,8 @@ func processContextPaths(workDir string, paths []string) string {
 
 							if result := processFile(path); result != "" {
 								resultCh <- result
-								logging.Info("Adding context from file", "file", path, "result", result[:600])
-
+								// logging.Info("Adding context from file", "file", path, "result", result[:600])
+								logging.Info("Adding context from file", "file", path)
 							}
 						} else {
 							processedMutex.Unlock()
@@ -109,7 +108,7 @@ func processContextPaths(workDir string, paths []string) string {
 					result := processFile(fullPath)
 					if result != "" {
 						resultCh <- result
-						logging.Info("Adding context from file", "file", fullPath, "result", result[:600])
+						logging.Info("Adding context from file", "file", fullPath)
 
 					}
 				} else {

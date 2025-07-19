@@ -100,10 +100,13 @@ func (v *viewTool) Run(ctx context.Context, call ToolCall) (ToolResponse, error)
 	var params ViewParams
 	logging.Debug("view tool params", "params", call.Input)
 	if err := json.Unmarshal([]byte(call.Input), &params); err != nil {
+		logging.Error("view tool failed to parse params", "error", err, "input", call.Input)
 		return NewTextErrorResponse(fmt.Sprintf("error parsing parameters: %s", err)), nil
 	}
+	logging.Debug("view tool parsed params successfully", "file_path", params.FilePath, "offset", params.Offset, "limit", params.Limit)
 
 	if params.FilePath == "" {
+		logging.Error("view tool missing file_path parameter")
 		return NewTextErrorResponse("file_path is required"), nil
 	}
 
@@ -111,12 +114,17 @@ func (v *viewTool) Run(ctx context.Context, call ToolCall) (ToolResponse, error)
 	filePath := params.FilePath
 	if !filepath.IsAbs(filePath) {
 		filePath = filepath.Join(config.WorkingDirectory(), filePath)
+		logging.Debug("view tool converted relative path to absolute", "original", params.FilePath, "absolute", filePath)
+	} else {
+		logging.Debug("view tool using absolute path", "file_path", filePath)
 	}
 
 	// Check if file exists
+	logging.Debug("view tool checking if file exists", "file_path", filePath)
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
+			logging.Error("view tool file not found", "file_path", filePath)
 			// Try to offer suggestions for similarly named files
 			dir := filepath.Dir(filePath)
 			base := filepath.Base(filePath)
@@ -142,11 +150,15 @@ func (v *viewTool) Run(ctx context.Context, call ToolCall) (ToolResponse, error)
 
 			return NewTextErrorResponse(fmt.Sprintf("File not found: %s", filePath)), nil
 		}
+		logging.Error("view tool error accessing file", "file_path", filePath, "error", err)
 		return ToolResponse{}, fmt.Errorf("error accessing file: %w", err)
 	}
 
+	logging.Debug("view tool file exists", "file_path", filePath, "size", fileInfo.Size())
+
 	// Check if it's a directory
 	if fileInfo.IsDir() {
+		logging.Error("view tool path is directory", "file_path", filePath)
 		return NewTextErrorResponse(fmt.Sprintf("Path is a directory, not a file: %s", filePath)), nil
 	}
 
@@ -169,10 +181,14 @@ func (v *viewTool) Run(ctx context.Context, call ToolCall) (ToolResponse, error)
 	}
 
 	// Read the file content
+	logging.Debug("view tool reading file content", "file_path", filePath, "offset", params.Offset, "limit", params.Limit)
 	content, lineCount, err := readTextFile(filePath, params.Offset, params.Limit)
 	if err != nil {
+		logging.Error("view tool failed to read file", "file_path", filePath, "error", err)
 		return ToolResponse{}, fmt.Errorf("error reading file: %w", err)
 	}
+
+	logging.Debug("view tool file read successfully", "file_path", filePath, "line_count", lineCount, "content_length", len(content))
 
 	notifyLspOpenFile(ctx, filePath, v.lspClients)
 	output := "<file>\n"
@@ -185,8 +201,13 @@ func (v *viewTool) Run(ctx context.Context, call ToolCall) (ToolResponse, error)
 			params.Offset+len(strings.Split(content, "\n")))
 	}
 	output += "\n</file>\n"
+
+	logging.Debug("view tool calling getDiagnostics", "file_path", filePath)
 	output += getDiagnostics(filePath, v.lspClients)
+	logging.Debug("view tool getDiagnostics completed successfully", "file_path", filePath)
+
 	recordFileRead(filePath)
+	logging.Debug("view tool completed successfully", "file_path", filePath)
 	return WithResponseMetadata(
 		NewTextResponse(output),
 		ViewResponseMetadata{

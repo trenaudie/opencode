@@ -61,10 +61,10 @@ func New(ctx context.Context, conn *sql.DB) (*App, error) {
 
 	var err error
 	app.CoderAgent, err = agent.NewAgent(
-		config.AgentCoder,
+		config.AgentOrchestrator,
 		app.Sessions,
 		app.Messages,
-		agent.CoderAgentTools(
+		agent.OrchestratorAgentTools(
 			app.Permissions,
 			app.Sessions,
 			app.Messages,

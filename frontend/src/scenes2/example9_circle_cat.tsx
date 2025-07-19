@@ -1,6 +1,5 @@
 import {Circle, makeScene2D, Path, Rect, Layout} from '@motion-canvas/2d';
 import {createRef, all, waitFor} from '@motion-canvas/core';
-import {logMethods} from './utils'; // Assuming this utility exists
 
 export default makeScene2D(function* (view) {
   // Set the background color of the view
