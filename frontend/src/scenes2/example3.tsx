@@ -1,18 +1,11 @@
-import {Circle, Layout, Rect, Node, makeScene2D, Txt, saturate, contrast} from '@motion-canvas/2d';
+import {Circle,makeScene2D} from '@motion-canvas/2d';
 import {
   all,
   createRef,
-  easeInExpo,
   easeInOutExpo,
-  waitFor,
-  waitUntil,
   ThreadGenerator,
-  chain,
   createSignal,
-  slideTransition,
   Direction,
-  easeOutCirc,
-  createEaseInOutBack,
   range,
 } from '@motion-canvas/core';
 import { InterpolationFunction } from '@motion-canvas/core';

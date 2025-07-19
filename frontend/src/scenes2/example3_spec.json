@@ -1,0 +1,243 @@
+{
+  "specification": {
+    "1. Imports": [
+      {
+        "name": "Circle",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "Layout",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "Rect",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "Node",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "makeScene2D",
+        "type": "scene factory",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "Txt",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "saturate",
+        "type": "filter utility",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "contrast",
+        "type": "filter utility",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "all",
+        "type": "animation utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "createRef",
+        "type": "reference utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "easeInExpo",
+        "type": "easing function",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "easeInOutExpo",
+        "type": "easing function",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "waitFor",
+        "type": "animation utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "waitUntil",
+        "type": "animation utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "ThreadGenerator",
+        "type": "type",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "chain",
+        "type": "animation utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "createSignal",
+        "type": "reactive utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "slideTransition",
+        "type": "transition utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "Direction",
+        "type": "enum/type",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "easeOutCirc",
+        "type": "easing function",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "createEaseInOutBack",
+        "type": "easing factory",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "range",
+        "type": "utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "InterpolationFunction",
+        "type": "type",
+        "source": "@motion-canvas/core"
+      }
+    ],
+
+    "2. Object Initialization": [
+      {
+        "name": "circles[0-3]",
+        "type": "Circle",
+        "quantity": 4,
+        "refs": "circles[0], circles[1], circles[2], circles[3]",
+        "initialPropertiesEach": {
+          "width": "radius() * 2",
+          "height": "radius() * 2",
+          "fill": "red/green/blue/yellow (for index 0/1/2/3)",
+          "x": "positions_during[i].x() = radius_outside_circle() * cos(angles_start[i] + theta_position())",
+          "y": "positions_during[i].y() = radius_outside_circle() * sin(angles_start[i] + theta_position())",
+          "positionType": "reactive (dynamic, updates as signals change)",
+          "rotation": 0,
+          "opacity": 1.0
+        },
+        "anchor": "center",
+        "styling": {},
+        "parent": "view"
+      }
+    ],
+
+    "3. Relative Positioning": {
+      "hierarchy": [
+        {
+          "parent": "view",
+          "children": [
+            "circles[0]",
+            "circles[1]",
+            "circles[2]",
+            "circles[3]"
+          ]
+        }
+      ],
+      "layout": [
+        {
+          "object": "circles[0-3]",
+          "alignment": "Each Circle is placed on a circle of radius radius_outside_circle(), at angle (angles_start[i] + theta_position()). Thus, all circles are equidistantly spaced on a circular path around the view center.",
+          "position": "calculated per circle: x = R·cos(angle), y = R·sin(angle); angles_start are [0, π/2, π, 3π/2] per circle.",
+          "dynamic": "Radius (radius_outside_circle) and rotational offset (theta_position) are both animated signals."
+        }
+      ]
+    },
+
+    "4. Animation Flow": [
+      {
+        "type": "parallel (all)",
+        "content": [
+          {
+            "target": "radius_outside_circle (signal)",
+            "property": "value",
+            "animation": [
+              {
+                "from": "view.width()/2 (initial, static setup for positions)",
+                "to": "100",
+                "duration": 6,
+                "easing": "easeInOutExpo"
+              },
+              {
+                "from": "100",
+                "to": "200",
+                "duration": 1,
+                "easing": "default"
+              }
+            ],
+            "comment": "Both steps called in sequence via radius_outside_circle(100, 6, easeInOutExpo).to(200, 1)."
+          },
+          {
+            "target": "theta_position (signal)",
+            "property": "value",
+            "from": "0",
+            "to": "4 * Math.PI",
+            "duration": 6,
+            "easing": "easeInOutExpo"
+          }
+        ],
+        "notes": [
+          "As both signals change over 6 seconds, circles move along their circular paths (rotating for 2 full turns, as 4π radians).",
+          "The radius signal shrinks the circular path (centripetal movement), then increases it back to 200 instantaneously."
+        ]
+      }
+    ],
+
+    "5. Optional Enhancements": {
+      "looping": "No looping for present animations.",
+      "conditionals": "None active in main scene.",
+      "eventTriggers": "None.",
+      "timelineComments": "None present.",
+      "interactive": "No user interactivity; all parameters are updated programmatically.",
+      "sceneConfiguration": {
+        "canvasResolution": "Intrinsic to parent view.",
+        "background": "Not explicitly set.",
+        "meta": "Reactive signals are used for animation; circles are built/destroyed at initialization and only change position dynamically.",
+        "colors": "Distinct color per circle as per 'colours' list.",
+        "transition/utility hooks": "Additional functions like outsideInPositioning() and acceleratingRotation() are present but NOT invoked."
+      }
+    },
+
+    "6. Utility/Helper Functions (Unused)": [
+      {
+        "name": "outsideInPositioning",
+        "arguments": [
+          "circle: Circle",
+          "direction: Direction",
+          "view_width: number",
+          "view_height: number"
+        ],
+        "purpose": "Would animate a given circle sliding in from outside the view toward a position near the edge based on given direction. Not called in the main scene.",
+        "animationFlow": [
+          "Animates circle.position.x/y from outside bounds (left/right/top/bottom) to near the edge over 2 seconds."
+        ]
+      },
+      {
+        "name": "acceleratingRotation",
+        "arguments": [
+          "circle: Circle",
+          "direction: Direction"
+        ],
+        "purpose": "Presumably to animate a circle with accelerating rotation; contains no implementation."
+      }
+    ]
+  }
+}

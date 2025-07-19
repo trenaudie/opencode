@@ -1,0 +1,240 @@
+{
+  "specification": {
+    "1. Imports": [
+      {
+        "name": "Circle",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "Rect",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "makeScene2D",
+        "type": "utility (scene factory)",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "all",
+        "type": "animation utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "createRef",
+        "type": "reference utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "easeInExpo",
+        "type": "easing function",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "easeInOutExpo",
+        "type": "easing function",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "waitFor",
+        "type": "animation utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "waitUntil",
+        "type": "animation utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "ThreadGenerator",
+        "type": "type",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "chain",
+        "type": "animation utility",
+        "source": "@motion-canvas/core"
+      }
+    ],
+
+    "2. Object Initialization": [
+      {
+        "name": "big_circle_obj",
+        "type": "Circle",
+        "ref": "big_circle",
+        "initialProperties": {
+          "width": 1100,
+          "height": 1100,
+          "position": { "x": 0, "y": 0 },
+          "fill": "blue",
+          "opacity": 0.3,
+          "rotation": 0
+        },
+        "anchor": "center (default for Circle)",
+        "styling": { "fill": "blue", "opacity": 0.3 },
+        "parent": "view"
+      },
+      {
+        "name": "circle3_obj",
+        "type": "Circle",
+        "ref": "circle3_parent",
+        "initialProperties": {
+          "width": "view_width / 6",
+          "height": "view_height / 6",
+          "position": {
+            "x": "view_width / 4",
+            "y": "-view_height / 4"
+          },
+          "fill": "red",
+          "opacity": 0.3,
+          "rotation": 0
+        },
+        "anchor": "center (default for Circle)",
+        "styling": { "fill": "red", "opacity": 0.3 },
+        "parent": "view"
+      },
+      {
+        "name": "circle4_obj",
+        "type": "Circle",
+        "ref": "circle4_child",
+        "initialProperties": {
+          "width": "view_width / 10",
+          "height": "view_height / 10",
+          "position": { "x": 0, "y": 0 },
+          "fill": "green",
+          "opacity": 0.8,
+          "rotation": 0
+        },
+        "anchor": "center (default for Circle)",
+        "styling": { "fill": "green", "opacity": 0.8 },
+        "parent": "circle3_obj"
+      },
+      {
+        "name": "circles",
+        "type": "Circle[]",
+        "count": 10,
+        "refs": "circles_refs[0..9]",
+        "initialPropertiesEach": {
+          "width": 20,
+          "height": 20,
+          "fill": "blue",
+          "opacity": 1,
+          "rotation": 0,
+          "position": {
+            "x": "i*40",
+            "y": "i*40"
+          }
+        },
+        "anchor": "center",
+        "parent": "view"
+      }
+    ],
+
+    "3. Relative Positioning": {
+      "hierarchy": [
+        {
+          "parent": "view",
+          "children": [
+            "big_circle_obj",
+            "circle3_obj",
+            "circles[0-9]"
+          ]
+        },
+        {
+          "parent": "circle3_obj",
+          "children": [
+            "circle4_obj"
+          ]
+        }
+      ],
+      "layout": [
+        {
+          "object": "big_circle_obj",
+          "alignment": "center of view",
+          "position": "(0,0) relative to view"
+        },
+        {
+          "object": "circle3_obj",
+          "alignment": "offset from view center",
+          "position": "(view_width/4, -view_height/4) relative to view origin"
+        },
+        {
+          "object": "circle4_obj",
+          "alignment": "center of parent (circle3_obj)",
+          "position": "(0,0) relative to circle3_obj center"
+        },
+        {
+          "object": "circles[0-9]",
+          "alignment": "diagonal, each offset by (40,40) increments",
+          "position": "(i*40, i*40) relative to view origin"
+        }
+      ]
+    },
+
+    "4. Animation Flow": {
+      "initial": "No property animations at start (all positions/props are direct assignments).",
+      "mainSequence": [
+        {
+          "type": "parallel (all)",
+          "details": [
+            {
+              "target": "circles[0-9]",
+              "property": "fill",
+              "function": "randomColor()",
+              "start": "blue (set during initialization)",
+              "end": "random color from [blue, red, green, yellow, purple, orange, pink]",
+              "duration": 0.5,
+              "easing": "default",
+              "notes": "Color change occurs as first step for each circle."
+            },
+            {
+              "target": "circles[0-9]",
+              "property": "position (x,y)",
+              "function": "rotationCircle()",
+              "animation": {
+                "steps": 30,
+                "perStep": {
+                  "x": "moves along circular path computed from original (x,y) vector length, at angle theta for each step",
+                  "y": "as above",
+                  "duration": 0.5 per step, for 30 steps (total 15 seconds per circle)",
+                  "easing": "easeInOutExpo",
+                  "additional": "Also triggers randomColor() at each step (concurrent color change)"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "timing": {
+        "allAnimations": "All 10 circles animate concurrently (both color and rotation), but each circle's animation is independent.",
+        "withinCircle": "Each circle position change step is concurrent for x, y, and fill."
+      }
+    },
+
+    "5. Optional Enhancements": {
+      "looping": "No loops at the scene level. Each circle's rotationCircle generator function loops over 30 steps for its animation.",
+      "conditionals": "No user interactivity or conditional branching.",
+      "logging": [
+        {
+          "type": "console.log",
+          "messages": [
+            "view min height/width",
+            "view width/height",
+            "circle4_obj.localToWorld()"
+          ]
+        }
+      ],
+      "events": [],
+      "labels": [],
+      "sceneConfiguration": {
+        "canvasResolution": "derived from parent view",
+        "background": "not explicitly set",
+        "meta": {
+          "uses dynamic refs and functions for animation",
+          "Objects sized and laid out relative to view size where relevant"
+        }
+      }
+    }
+  }
+}

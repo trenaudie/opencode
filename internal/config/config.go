@@ -119,7 +119,7 @@ var defaultContextPaths = []string{
 	// "OPENCODE.md",
 	// "OPENCODE.local.md",
 	"MotionCanvasGuidelines.md",
-	"MotionCanvasExamples.md",
+	// "MotionCanvasExamples.md", they are kept for the coder agent though
 }
 
 // getDefaultContextPaths returns the default context paths with Motion Canvas examples added

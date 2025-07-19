@@ -1,0 +1,341 @@
+{
+  "specification": {
+    "1. Imports": [
+      {
+        "name": "Circle",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "Grid",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "Layout",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "Line",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "Node",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "Rect",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "Txt",
+        "type": "component",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "makeScene2D",
+        "type": "scene factory",
+        "source": "@motion-canvas/2d"
+      },
+      {
+        "name": "all",
+        "type": "animation utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "createSignal",
+        "type": "reactive signal utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "easeInOutBounce",
+        "type": "easing function",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "linear",
+        "type": "easing function",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "waitFor",
+        "type": "animation utility",
+        "source": "@motion-canvas/core"
+      },
+      {
+        "name": "createRef",
+        "type": "reference utility",
+        "source": "@motion-canvas/core"
+      }
+    ],
+
+    "2. Object Initialization": [
+      {
+        "name": "time",
+        "type": "Signal<number>",
+        "initialValue": 0
+      },
+      {
+        "name": "value",
+        "type": "Signal<number>",
+        "initialValue": 0
+      },
+      {
+        "name": "rectref",
+        "type": "Ref<Rect>",
+        "initialValue": "undefined (assigned on Rect creation)"
+      },
+      {
+        "name": "Main Node",
+        "type": "Node",
+        "properties": {
+          "y": -30
+        },
+        "children": [
+          {
+            "type": "Grid",
+            "properties": {
+              "size": 700,
+              "stroke": "#444",
+              "lineWidth": 3,
+              "spacing": 100
+            },
+            "children": [
+              {
+                "type": "Rect",
+                "ref": "rectref",
+                "properties": {
+                  "layout": true,
+                  "size": 100,
+                  "offset": [-1, 1],
+                  "x": "time() * 500 - 300",
+                  "y": "value() * -500 + 300",
+                  "lineWidth": 4
+                },
+                "children": [
+                  {
+                    "type": "Circle",
+                    "properties": {
+                      "size": 60,
+                      "fill": "#C22929",
+                      "margin": 20
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "Node",
+            "properties": {
+              "position": [-400, -400]
+            },
+            "children": [
+              {
+                "type": "Line",
+                "properties": {
+                  "lineWidth": 4,
+                  "points": [
+                    [0, 750],
+                    [0, 35]
+                  ],
+                  "stroke": "#DDD",
+                  "lineCap": "round",
+                  "endArrow": true,
+                  "arrowSize": 15
+                }
+              },
+              {
+                "type": "Layout",
+                "properties": {
+                  "y": "value() * -500 + 650"
+                },
+                "children": [
+                  {
+                    "type": "Txt",
+                    "properties": {
+                      "fill": "#DDD",
+                      "text": "value() .toFixed(2).toString()",
+                      "fontWeight": 300,
+                      "fontSize": 30,
+                      "x": -55,
+                      "y": 3
+                    }
+                  },
+                  {
+                    "type": "Circle",
+                    "properties": {
+                      "size": 30,
+                      "fill": "#DDD"
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "Txt",
+                "properties": {
+                  "y": 400,
+                  "x": -160,
+                  "fontWeight": 400,
+                  "fontSize": 50,
+                  "padding": 20,
+                  "fontFamily": "Candara",
+                  "fill": "#DDD",
+                  "text": "VALUE"
+                }
+              }
+            ]
+          },
+          {
+            "type": "Node",
+            "properties": {
+              "position": [-400, -400]
+            },
+            "children": [
+              {
+                "type": "Line",
+                "properties": {
+                  "lineWidth": 4,
+                  "points": [
+                    [50, 800],
+                    [765, 800]
+                  ],
+                  "stroke": "#DDD",
+                  "lineCap": "round",
+                  "endArrow": true,
+                  "arrowSize": 15
+                }
+              },
+              {
+                "type": "Layout",
+                "properties": {
+                  "y": 800,
+                  "x": "time() * 500 + 150"
+                },
+                "children": [
+                  {
+                    "type": "Circle",
+                    "properties": {
+                      "size": 30,
+                      "fill": "#DDD"
+                    }
+                  },
+                  {
+                    "type": "Txt",
+                    "properties": {
+                      "fill": "#DDD",
+                      "text": "(time() * TIME).toFixed(2).toString()",
+                      "fontWeight": 300,
+                      "fontSize": 30,
+                      "y": 50
+                    }
+                  }
+                ]
+              },
+              {
+                "type": "Txt",
+                "properties": {
+                  "y": 900,
+                  "x": 400,
+                  "fontWeight": 400,
+                  "fontSize": 50,
+                  "padding": 20,
+                  "fontFamily": "Candara",
+                  "fill": "#DDD",
+                  "text": "TIME"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ],
+
+    "3. Relative Positioning": {
+      "hierarchy": [
+        {
+          "parent": "Main Node",
+          "children": [
+            "Grid (contains Rect, contains Circle)",
+            "Vertical Axis Node (contains Line, Layout, Txt label)",
+            "Horizontal Axis Node (contains Line, Layout, Txt label)"
+          ]
+        }
+      ],
+      "layout": [
+        {
+          "object": "Grid",
+          "position": "Center of scene, shifted y by -30 units via Main Node",
+          "child": {
+            "Rect": "Position determined by signals: x = time() * 500 - 300, y = value() * -500 + 300",
+            "offset": "[-1, 1]: aligns Rect corner to position as reference"
+          },
+          "Rect child": {
+            "Circle": "centered in Rect with margin 20"
+          }
+        },
+        {
+          "object": "Vertical Axis Node",
+          "position": "[-400, -400]",
+          "children": [
+            "Line: from (0, 750) to (0, 35) (vertical arrow)",
+            "Layout: y = value() * -500 + 650, contains Value label and tracker Circle",
+            "Txt: 'VALUE' label at (x: -160, y: 400)"
+          ]
+        },
+        {
+          "object": "Horizontal Axis Node",
+          "position": "[-400, -400]",
+          "children": [
+            "Line: from (50, 800) to (765, 800) (horizontal arrow)",
+            "Layout: y=800, x = time() * 500 + 150, contains Time label and tracker Circle",
+            "Txt: 'TIME' label at (x: 400, y: 900)"
+          ]
+        }
+      ]
+    },
+
+    "4. Animation Flow": [
+      {
+        "sequence": [
+          {
+            "action": "wait",
+            "duration": 0.5
+          },
+          {
+            "action": "console.log",
+            "target": "rectref()",
+            "comment": "Debug: logs the Rect instance."
+          },
+          {
+            "action": "all (parallel)",
+            "animations": [
+              {
+                "target": "time",
+                "property": "signal value",
+                "from": 0,
+                "to": 1,
+                "duration": 3.5,
+                "easing": "linear"
+              },
+              {
+                "target": "value",
+                "property": "signal value",
+                "from": 0,
+                "to": 1,
+                "duration": 3.5,
+                "easing": "easeInOutBounce"
+              }
+            ]
+          },
+          {
+            "action": "wait",
+            "duration": 0.8
+          }
+        ],
+        "signalEffect": [
+          {
