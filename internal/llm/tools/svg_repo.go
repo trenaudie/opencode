@@ -122,11 +122,28 @@ func (l *SVGRepoTool) Run(ctx context.Context, call ToolCall) (ToolResponse, err
 	if totalDownloaded == 0 {
 		return NewTextErrorResponse("No SVG icons were successfully downloaded"), nil
 	}
+	var toolResponse ToolResponse
+	toolResponse.Type = ToolResponseTypeText
 
-	return WithResponseMetadata(
-		NewTextResponse(fmt.Sprintf("Downloaded %d SVG icons to %s directory", totalDownloaded, publicDir)),
-		SVGRepoResponseMetadata{
-			FilesPaths: FilepathListDebug,
-		},
-	), nil
+	responseData := map[string]any{
+		"filepaths": FilepathListDebug,
+		"text":      fmt.Sprintf("Downloaded %d SVG icons to %s directory", totalDownloaded, publicDir),
+	}
+
+	contentBytes, err := json.Marshal(responseData)
+	if err != nil {
+		return NewTextErrorResponse(fmt.Sprintf("error marshaling response: %s", err)), nil
+	}
+	toolResponse.Content = string(contentBytes)
+
+	metadataBytes, err := json.Marshal(SVGRepoResponseMetadata{
+		FilesPaths: FilepathListDebug,
+	})
+	if err != nil {
+		return NewTextErrorResponse(fmt.Sprintf("error marshaling metadata: %s", err)), nil
+	}
+	toolResponse.Metadata = string(metadataBytes)
+	toolResponse.IsError = false
+
+	return toolResponse, nil
 }

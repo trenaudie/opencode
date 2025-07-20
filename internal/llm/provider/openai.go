@@ -167,6 +167,17 @@ func (o *openaiClient) preparedParams(messages []openai.ChatCompletionMessagePar
 		Messages: messages,
 		Tools:    tools,
 	}
+	// var messages_with_tool_roles []message.Message
+	// for _, msg := range messages {
+	// 	if msg.Role == message.Tool {
+	// 		messages_with_tool_roles = append(messages_with_tool_roles, msg)
+	// 	}
+	// }
+	// if len(messages_with_tool_roles) > 0 {
+	// 	logging.Info(fmt.Sprintf("messages with tool roles: %v", messages_with_tool_roles))
+	// } else {
+	// 	logging.Info("no messages with tool roles found")
+	// }
 
 	if o.providerOptions.model.CanReason == true {
 		params.MaxCompletionTokens = openai.Int(o.providerOptions.maxTokens)
@@ -189,10 +200,10 @@ func (o *openaiClient) preparedParams(messages []openai.ChatCompletionMessagePar
 
 func (o *openaiClient) send(ctx context.Context, messages []message.Message, tools []tools.BaseTool) (response *ProviderResponse, err error) {
 	params := o.preparedParams(o.convertMessages(messages), o.convertTools(tools))
-	cfg := config.Get()
-	if cfg.Debug {
-		jsonData, _ := json.Marshal(params)
-	}
+	// cfg := config.Get()
+	// if cfg.Debug {
+	// 	jsonData, _ := json.Marshal(params)
+	// }
 	attempts := 0
 	for {
 		attempts++

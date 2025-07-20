@@ -324,6 +324,7 @@ func (a *agent) createUserMessage(ctx context.Context, sessionID, content string
 func (a *agent) streamAndHandleEvents(ctx context.Context, sessionID string, msgHistory []message.Message) (message.Message, *message.Message, error) {
 	ctx = context.WithValue(ctx, tools.SessionIDContextKey, sessionID)
 	logging.Info("adding tools to the call using ", "tool_count", len(a.tools))
+
 	for index, tool := range a.tools {
 		var name string
 		if a.tools[index].Info().Name != "" {
@@ -451,7 +452,7 @@ out:
 	if err != nil {
 		return assistantMsg, nil, fmt.Errorf("failed to create cancelled tool message: %w", err)
 	}
-
+	logging.Info(fmt.Sprintf("%d tool results and %d parts added to new tool results message", len(toolResults), len(parts)))
 	return assistantMsg, &msg, err
 }
 

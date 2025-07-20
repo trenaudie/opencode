@@ -34,7 +34,7 @@
         "x": "number|string",
         "y": "number|string",
         "position": "[number,number]|string",
-        "size": "number|[number,number]", // good for Circle,  for SVG
+        "size": "number|[number,number]", // must use for Circle, for SVG
         "width": "number|string", //good for Rect, Layout 
         "height": "number|string",//good for Rect, Layout
         "fill": "string",
@@ -43,7 +43,6 @@
         "start": "number",
         "end": "number",
         "scale": "number",
-        "radius": "number",
         "grow": "number",
         "gap": "number",
         "padding": "number",
