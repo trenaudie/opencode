@@ -177,7 +177,7 @@ I may also provide you some exmaples of Motion Canvas Code, for you to see the s
 
     // Duration / time
     "duration": "number|null",            // In seconds (support float/duration/named)
-    "timingFunction": "string|null",      // Easing, 'easeInOutCubic' etc. Also can specify for springs.
+    "timingFunction": "string|null",      // Easing, easeInOutCubic etc. It must be used as an actual object imported from '@motion-canvas/core' NOT AS A STRING. eg. circleRef().fill("white", 3 , EaseInOutCubic)
     "easing": "string|null",              // Alias for compatibility
     "springType": "string|null",          // For spring animation ('PlopSpring', 'SmoothSpring', etc)
 
@@ -301,7 +301,6 @@ import {
   Vector2
 } from '@motion-canvas/core';
 import logo from '/public/logo.svg?raw';
-console.log(`found logo ${logo}`)
 const numRows = 5;
 const baseWidth = 560;
 const widthStep = 80;

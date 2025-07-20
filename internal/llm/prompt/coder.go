@@ -65,15 +65,20 @@ InterpolationFunction
 } from @motion-canvas/core;
 
 6. Asset imports
-You may import SVGs in your generated code. The SVGs must come from the frontend/public/ directory of the project. 
-Always import them with 
-
+You may import SVGs in your generated code
+ The SVGs must come from the frontend/public/ directory of the project. 
+The SVGs must be imported as a raw string from the public dir, using the '?raw' flag
+Always use the following format import logo from '/public/<svgname>.svg?raw';
 
 7. OUTPUT
 (CRITICAL)
 You must ultimately output the written .tsx file to the frontend/src/scenes/example.tsx file. It already exists, but you must call the tool to edit it.
+The code must run, so you cannot invent any names of functions or attributes. All Motion Canvas specific syntax MUST come from either the SPEC FORMAT sheet or the examples given below.
+If you do not know the name of a function or attribute, you must mention it in your response, and not add it in your typescript code output. 
 
 I will provide you some examples of Motion Canvas Code, for you to see the syntax and these guidelines in practice.
+
+
 
 # EXAMPLES :
 import {
