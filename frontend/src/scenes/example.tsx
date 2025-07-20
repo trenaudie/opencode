@@ -1,43 +1,35 @@
-import { makeScene2D, Rect, Node, SVG, Path } from '@motion-canvas/2d';
-import {  createRef, createSignal, all, waitFor , easeOutBack} from '@motion-canvas/core';
-import hospitalSVG from '/public/hospital_1.svg?raw';
+import {
+  makeScene2D,
+  SVG,
+  Path
+} from '@motion-canvas/2d';
+import {
+  all,
+  waitFor,
+  createRef
+} from '@motion-canvas/core';
+import dog from '/public/dog_1.svg?raw';
 
 export default makeScene2D(function* (view) {
-  // Set background color
   view.fill('#000000');
 
-  // Create a reference for the container and the SVG
-  const container = createRef<Rect>();
-  const svgRef = createRef<SVG>();
+  const dogRef = createRef<SVG>();
 
-  // Initialize the container
   view.add(
-    <Rect
-      ref={container}
-      width={400}
-      height={400}
-    >
-      <SVG
-        ref={svgRef}
-        svg={hospitalSVG}
-        size={300} // Set base size
-        scale={0} // Start scaled down
-        opacity={1}
-      />
-    </Rect>
+    <SVG 
+      ref={dogRef} 
+      svg={dog.replace("@color", "#f2ff48")} 
+      size={300} 
+      position={() => [view.width() / 2, view.height() / 2]}
+    />
   );
 
-  // Animation: Pop in the hospital icon
-  yield* svgRef().scale(1, 0.9, easeOutBack); // Scale up the SVG from zero
+  yield* dogRef().scale(1, 0.5);  
+  yield* dogRef().opacity(1, 0.5); 
 
-  // Animate the paths filling from gray to white
-  // Correct hierarchy: paths are usually under Node in SVG
-  const nodeChildren = svgRef().children()[0]?.children() || [];
-  for (const child of nodeChildren) {
+  for (const child of dogRef().children()[0].children()) {
     if (child instanceof Path) {
-      yield* child.fill('gray', 0); // Set initial fill to gray
-      yield* child.fill('white', 0.3); // Animate fill to white
-      yield* waitFor(0.1); // Wait slightly between fills
+      yield* child.fill('white', 1);
     }
   }
 });
