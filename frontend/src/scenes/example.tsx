@@ -31,11 +31,13 @@ export default makeScene2D(function* (view) {
   yield* svgRef().scale(1, 0.9, easeOutBack); // Scale up the SVG from zero
 
   // Animate the paths filling from gray to white
-  const paths = svgRef().children().filter(child => child instanceof Path);
-  for (const path of paths) {
-    console.log('Animating path:', path);
-    yield* path.fill('gray', 0); // Set initial fill to gray
-    yield* path.fill('white', 0.3); // Animate fill to white
-    yield* waitFor(0.1); // Wait slightly between fills
+  // Correct hierarchy: paths are usually under Node in SVG
+  const nodeChildren = svgRef().children()[0]?.children() || [];
+  for (const child of nodeChildren) {
+    if (child instanceof Path) {
+      yield* child.fill('gray', 0); // Set initial fill to gray
+      yield* child.fill('white', 0.3); // Animate fill to white
+      yield* waitFor(0.1); // Wait slightly between fills
+    }
   }
 });
