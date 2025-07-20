@@ -36,7 +36,7 @@ func GetAgentPrompt(agentName config.AgentName, provider models.ModelProvider) s
 		contextContent := getContextFromPaths()
 		logging.Info("retrieved ", len(contextContent), " characters of context")
 		if contextContent != "" {
-			finalPrompt = fmt.Sprintf("%s\n\n# Project-Specific Context\n Make sure to follow the instructions in the context below\n%s", basePrompt, contextContent)
+			finalPrompt = fmt.Sprintf("%s\n\n# Motion-Canvas - Specific Context\n Make sure to follow the instructions in the context below\n%s", basePrompt, contextContent)
 		} else {
 			finalPrompt = basePrompt
 		}

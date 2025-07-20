@@ -1,25 +1,57 @@
-import { Rect, makeScene2D } from '@motion-canvas/2d';
-import { createRef } from '@motion-canvas/core';
+import {
+  Rect,
+  Node,
+  makeScene2D,
+} from '@motion-canvas/2d';
+import {
+  createSignal,
+  createRef,
+  all,
+  waitFor,
+  linear
+} from '@motion-canvas/core';
+
+const numRows = 5;
+const baseWidth = 560;
+const widthStep = 80;
+const boxHeight = 48;
+const gap = 8;
 
 export default makeScene2D(function* (view) {
-  // Set the background color
+  // Set background color
   view.fill('#000000');
 
-  // Create references for the rectangle
-  const rectRef = createRef<Rect>();
+  // Refs for rectangles and signals for opacity
+  const rectRefs = Array.from({ length: numRows }, () => createRef<Rect>());
+  const rectSignals = Array.from({ length: numRows }, () => createSignal(0));
 
-  // Reactive dimensions
-  const rectWidth = () => view.width() * 0.8;  // 80% of the view's width
-  const rectHeight = () => view.height() * 0.2; // 20% of the view's height
-
-  // Add the rectangle to the view
+  // Main container Node to stack rectangles
+  const container = createRef<Node>();
   view.add(
-    <Rect
-      ref={rectRef}
-      width={rectWidth}
-      height={rectHeight}
-      fill={'#3498db'} // Filling with a visible blue color
-      position={[0, 0]} // Centered in the view
-    />
+    <Node ref={container}>
+      {Array.from({ length: numRows }, (_, i) => {
+        const width = baseWidth - i * widthStep;
+        const y = () => (i * (boxHeight + gap)) - (numRows * (boxHeight + gap) / 2) + (boxHeight / 2);
+
+        return (
+          <Rect
+            ref={rectRefs[i]}
+            width={width}
+            height={boxHeight}
+            fill={'#6cf1c2'}
+            y={y}
+            opacity={rectSignals[i]} // opacity controlled by signal
+          />
+        );
+      })}
+    </Node>
   );
+
+  // Fade in rectangles one by one
+  for (let i = 0; i < numRows; i++) {
+    yield* all(
+      rectSignals[i](1, 0.5, linear), // Fade to opaque
+      waitFor(0.2) // Wait before next rectangle
+    );
+  }
 });
