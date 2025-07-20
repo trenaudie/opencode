@@ -323,9 +323,15 @@ func (a *agent) createUserMessage(ctx context.Context, sessionID, content string
 
 func (a *agent) streamAndHandleEvents(ctx context.Context, sessionID string, msgHistory []message.Message) (message.Message, *message.Message, error) {
 	ctx = context.WithValue(ctx, tools.SessionIDContextKey, sessionID)
-	logging.Info("adding tools to the call using", "tool_count", len(a.tools))
-	for _, tool := range a.tools {
-		logging.Info("calling with tool", "tool_name", tool.Info().Name)
+	logging.Info("adding tools to the call using ", "tool_count", len(a.tools))
+	for index, tool := range a.tools {
+		var name string
+		if a.tools[index].Info().Name != "" {
+			name = a.tools[index].Info().Name
+		} else {
+			name = fmt.Sprintf("tool_%d", index)
+		}
+		logging.LogToolInfo(name, tool.Info())
 	}
 	eventChan := a.provider.StreamResponse(ctx, msgHistory, a.tools)
 

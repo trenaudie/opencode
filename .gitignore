@@ -49,4 +49,4 @@ opencode.md
 main 
 
 #frontend - downloaded assets 
-public/*.svg
+frontend/public/*.svg

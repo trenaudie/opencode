@@ -162,12 +162,39 @@ func LogOutput(agentName string, content string, toolCalls interface{}) {
 	Debug("Output logged", "filepath", filepath, "agent", agentName, "content_length", len(outputContent))
 }
 
+func LogToolInfo(toolName string, toolInfo interface{}) {
+	if toolInfo == nil {
+		Warn("Tool info is nil, skipping log entry", "tool", toolName)
+		return
+	}
+
+	// Create timestamp for filename
+	timestamp := time.Now().Format("2006-01-02_15-04-05")
+	filename := fmt.Sprintf("%s_%s_tool_info.json", timestamp, toolName)
+	filepath := filepath.Join("logs", "tool_info", filename)
+
+	// Marshal tool info to JSON
+	jsonData, err := json.MarshalIndent(toolInfo, "", "  ")
+	if err != nil {
+		Warn("Failed to marshal tool info to JSON", "error", err, "tool", toolName)
+		return
+	}
+
+	// Write to file
+	if err := os.WriteFile(filepath, jsonData, 0644); err != nil {
+		Warn("Failed to write tool info to file", "error", err, "filepath", filepath, "tool", toolName)
+		return
+	}
+
+	Debug("Tool info logged", "filepath", filepath, "tool", toolName)
+}
+
 // For tool calls, it marshals the data to JSON with indentation
 func LogToolOutput(toolName string, content string) {
 
 	// Create timestamp for filename
 	timestamp := time.Now().Format("2006-01-02_15-04-05")
-	filename := fmt.Sprintf("%s_%s.txt", toolName, timestamp)
+	filename := fmt.Sprintf("%s_%s.txt", timestamp, "_tool_"+toolName)
 	filepath := filepath.Join("logs", "output", filename)
 
 	var outputContent string

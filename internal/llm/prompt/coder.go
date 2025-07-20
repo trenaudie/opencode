@@ -406,9 +406,11 @@ export default makeScene2D(function* (view) {
             // Use the same data mapping for the tracker
             const world_position = rectref().absolutePosition();
             const matrix = noderef().worldToLocal();
-            console.log(`world position is ${world_position}`);
+
+            console.log("world position is ", world_position);
             const localPosition = world_position.transformAsPoint(matrix);
-            console.log(`local position is ${localPosition}`);
+
+            console.log("local position is ", localPosition);
             return localPosition.y + 400; // Add 400 to compensate for the inner Node's y-offset
           }}>
             <Txt
@@ -642,10 +644,10 @@ import {
 
 export default makeScene2D(function* (view) {
 
-  console.log(`view min height: ${view.minHeight()}`);
-  console.log(`view min width: ${view.minWidth()}`);
-  console.log(`view width: ${view.width()}`);
-  console.log(`view height: ${view.height()}`);
+  
+  
+  
+  
   const view_height = view.height();
   const view_width = view.width();
   const circle = createRef<Circle>();
@@ -785,7 +787,6 @@ function* outsideInPositioning(circle: Circle, direction: Direction, view_width:
   let position_start_y = null;
   let position_end_x = null;
   let position_end_y = null;
-  console.log(`logging circle ${circle}`)
   if (direction == Direction.Left) {
     position_start_x = -view_width/2;
     position_start_y = 0;
@@ -807,7 +808,6 @@ function* outsideInPositioning(circle: Circle, direction: Direction, view_width:
     position_end_x = position_start_x;
     position_end_y = circle.height();
   }
-  console.log(`position_start_x: ${position_start_x}, position_start_y: ${position_start_y}, position_end_x: ${position_end_x}, position_end_y: ${position_end_y}`)
   yield* all(
     circle.position.x(position_start_x, 0, easeInOutExpo).to(position_end_x, 2, easeInOutExpo),
     circle.position.y(position_start_y, 0, easeInOutExpo).to(position_end_y, 2, easeInOutExpo),
@@ -1001,7 +1001,7 @@ export default makeScene2D(function* (view) {
     );
   }
   
-  console.log(`len colours_lerped ${colours_lerped.length}`);
+  
   const colours_lerped_final = colours_lerped.filter((_, index) => index % 2 === 0);
     yield*   tween(2, value => {
     const colour_1lerp =       Color.lerp(
@@ -1009,7 +1009,6 @@ export default makeScene2D(function* (view) {
       new Color('#e13238'),
       easeInOutCubic(value),
     );
-    console.log(`colour_1lerp ${colour_1lerp}`)
     circle().fill(colour_1lerp);
   });
 });/* This example performs visualization of the interpolation function easeinoutCubic
@@ -1066,7 +1065,7 @@ export default makeScene2D(function* (view) {
   
   // Simple effect - just add/remove circles
   const effect = createEffect(() => {
-    console.log(`Effect triggered! count is ${count()}`);
+    
     
     if (num_circles_current() < count()) {
       const circleIndex = num_circles_current();
@@ -1084,14 +1083,12 @@ export default makeScene2D(function* (view) {
     let old_count = count();
     const value_starts = Array.from({ length: max_circles }, (_, k) => k / max_circles);
     count(Math.ceil(value * max_circles));
-    console.log(`value_starts ${value_starts}`);
     for (let i = 0; i < count(); i++) {
         let time_left = max_circles - i ;
         let coef = 1/ time_left;
-        console.log(`i = ${i} coef = ${coef} value = ${value} -> ${coef*(value-value_starts[i])*max_circles}`)
         if(circles[i]()){
             circles[i]().scale(map(0,1,coef*(value-value_starts[i])*max_circles ))
-            if (old_count< count()) { console.log(`new circle created ! `)}
+            if (old_count< count()) { }
     }}
   });
   
@@ -1377,7 +1374,6 @@ import {
   Vector2
 } from '@motion-canvas/core';
 import logo from '/public/logo.svg?raw';
-console.log(`found logo ${logo}`)
 const numRows = 5;
 const baseWidth = 560;
 const widthStep = 80;
@@ -1416,10 +1412,10 @@ export default makeScene2D(function* (view) {
     </Node>
       <SVG ref={logoRef} svg={logo.replace("@color", "#f2ff48")} size = {300}  position= {() => {
         let svg_world_to_parent = logoRef().worldToParent();
-      console.log(`the last child of the container is ${container().children().at(-1).absolutePosition()}`);
-            console.log(`which, converting to the Parent of the SVG means: ${svg_world_to_parent.transformPoint(container().children().at(-1).absolutePosition())}`);
+      console.log("the last child of the container is ", container().children().at(-1).absolutePosition());
+            console.log("which, converting to the Parent of the SVG means: ", svg_world_to_parent.transformPoint(container().children().at(-1).absolutePosition()));
             let gap_between_last_rectangle_and_svg_vector =  new Vector2(0, gap_between_last_rectangle_and_svg_y);
-            console.log(`gap is ${gap_between_last_rectangle_and_svg_vector}`)
+            console.log("gap is ", gap_between_last_rectangle_and_svg_vector);
     return container().children().at(-1).absolutePosition().transformAsPoint(svg_world_to_parent).add(gap_between_last_rectangle_and_svg_vector)
     }}/>
   </>
