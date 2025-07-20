@@ -1,35 +1,56 @@
 import {
+  Rect,
+  Node,
   makeScene2D,
   SVG,
-  Path
+  Path,
 } from '@motion-canvas/2d';
 import {
+  createRef,
   all,
   waitFor,
-  createRef
 } from '@motion-canvas/core';
-import dog from '/public/dog_1.svg?raw';
+import moon from '/public/moon.svg?raw';
 
 export default makeScene2D(function* (view) {
+  // Set background color
   view.fill('#000000');
 
-  const dogRef = createRef<SVG>();
+  // Reference for the moon SVG and container
+  const moonRef = createRef<SVG>();
+  const mainRectRef = createRef<Rect>();
 
   view.add(
-    <SVG 
-      ref={dogRef} 
-      svg={dog.replace("@color", "#f2ff48")} 
-      size={300} 
-      position={() => [view.width() / 2, view.height() / 2]}
-    />
+    <Node>
+      <Rect
+        ref={mainRectRef}
+        width={600}
+        height={600}
+        fill={null}
+        x={0}
+        y={0}
+      >
+        <SVG
+          ref={moonRef}
+          svg={moon}
+          size={300}
+          opacity={0}
+          scale={0}
+        />
+      </Rect>
+    </Node>
   );
 
-  yield* dogRef().scale(1, 0.5);  
-  yield* dogRef().opacity(1, 0.5); 
-
-  for (const child of dogRef().children()[0].children()) {
+  // Set the fill color of every Path child in the moon SVG to pale yellow
+  for (const child of moonRef().children()[0].children()) {
     if (child instanceof Path) {
-      yield* child.fill('white', 1);
+      yield* child.fill('#fffbe0', 0);
     }
   }
+
+  // Animate the moon SVG scale and opacity
+  yield* all(
+    moonRef().scale(1, 0.5), // Animate scale to 1
+    moonRef().opacity(1, 0.5) // Animate opacity to 1
+  );
 });

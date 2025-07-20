@@ -102,7 +102,7 @@ func LogInput(agentName string, inputContent string, systemPrompt string) {
 
 	// Create timestamp for filename
 	timestamp := time.Now().Format("2006-01-02_15-04-05")
-	filename := fmt.Sprintf("%s_%s.txt", agentName, timestamp)
+	filename := fmt.Sprintf("%s_%s.txt", timestamp, agentName)
 	filepath := filepath.Join("logs", "input", filename)
 
 	// Combine input content and system prompt

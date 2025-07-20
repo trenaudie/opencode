@@ -3,11 +3,11 @@
   "description": "string (concise, what is shown/animated, key visual/logic concept)",
 
   "sceneMetadata": {
-    "background": "string|null",                                // Used if explicitly set, else omit/null
-    "canvasDefaults": "object|null",                            // As present (empty/default if not specified)
-    "viewport": "string|null",                                  // Only if present in scene
-    "canvasResolution": "object|null",                          // Only if present
-    "other": "object|null"                                      // Misc, if needed (from scene objects)
+    "background": "string",                                // Used if explicitly set, else omit/null
+    "canvasDefaults": "object",                            // As present (empty/default if not specified)
+    "viewport": "string",                                  // Only if present in scene
+    "canvasResolution": "object",                          // Only if present
+    "other": "object"                                      // Misc, if needed (from scene objects)
   },
 
   "imports": [
@@ -28,49 +28,48 @@
     {
       "name": "string (optional, for referencing/hierarchy clarity)",
       "type": "component/class (Circle, Layout, CodeBlock, Rect, Node, Path, Grid, Line, Txt, Latex, etc.)",
-      "ref": "string|null",                             // e.g. "colA", "circleRefs[0]", or null
-      "parent": "string|null",                          // For top-level, value is "view", or another name in this list
+      "ref": "string",                             // e.g. "colA", "circleRefs[0]", or null
+      "parent": "string",                          // For top-level, value is "view", or another name in this list
       "properties": {
-        // Only those present across all examples, Partial, as used
-        "x": "number|string|null",
-        "y": "number|string|null",
-        "position": "[number,number]|string|null",
-        "size": "number|[number,number]|null",
-        "width": "number|string|null",
-        "height": "number|string|null",
-        "fill": "string|null",
-        "stroke": "string|null",
-        "lineWidth": "number|null",
-        "start": "number|null",
-        "end": "number|null",
-        "scale": "number|null",
-        "radius": "number|null",
-        "grow": "number|null",
-        "gap": "number|null",
-        "padding": "number|null",
-        "margin": "number|null",
-        "alignItems": "string|null",
-        "justifyContent": "string|null",
-        "direction": "string|null",
-        "layout": "boolean|null",
-        "fontWeight": "number|string|null",
-        "fontSize": "number|null",
-        "fontFamily": "string|null",
-        "opacity": "number|null",
-        "text": "string|array|null",
-        "tex": "string|array|null",
-        "code": "string|null",
-        "data": "string|null",
-        "arrowSize": "number|null",
-        "endArrow": "boolean|null",
-        "lineCap": "string|null",
-        "points": "array|null",
-        "others": "object|null"
+        "x": "number|string",
+        "y": "number|string",
+        "position": "[number,number]|string",
+        "size": "number|[number,number]", // good for Circle,  for SVG
+        "width": "number|string", //good for Rect, Layout 
+        "height": "number|string",//good for Rect, Layout
+        "fill": "string",
+        "stroke": "string",
+        "lineWidth": "number",
+        "start": "number",
+        "end": "number",
+        "scale": "number",
+        "radius": "number",
+        "grow": "number",
+        "gap": "number",
+        "padding": "number",
+        "margin": "number",
+        "alignItems": "string",
+        "justifyContent": "string",
+        "direction": "string",
+        "layout": "boolean",
+        "fontWeight": "number|string",
+        "fontSize": "number",
+        "fontFamily": "string",
+        "opacity": "number",
+        "text": "string|array",
+        "tex": "string|array",
+        "code": "string",
+        "data": "string",
+        "arrowSize": "number",
+        "endArrow": "boolean",
+        "lineCap": "string",
+        "points": "array",
+        "others": "object"
       },
-      "anchor": "string|null",
-      "staticStyling": "object|string|null",
-      "children": "array|null",    // (Repeat objectInitialization format, supports deep nesting)
-      "count": "number|null"       // If this object is a group/array
+      "anchor": "string",
+      "staticStyling": "object|string",
+      "children": "array",    // (Repeat objectInitialization format, supports deep nesting)
+      "count": "number"       // If this object is a group/array
 
     }
     // ...more as needed by scene
@@ -115,23 +114,23 @@
       "type": "string",                  // e.g. "set" | "edit" | "custom"
                                         // analogous to animationFlow.type but no timing
       // Targets
-      "target": "string|array|null",     // ref name(s) or selector(s) of node(s)
-      "property": "string|array|null",   // e.g. "fill", ["fill","stroke"], "opacity"
+      "target": "string|array",     // ref name(s) or selector(s) of node(s)
+      "property": "string|array",   // e.g. "fill", ["fill","stroke"], "opacity"
 
       // Value assignment
-      "from": "number|string|array|object|null", 
+      "from": "number|string|array|object", 
                                         // optional start value (for clarity)
-      "to": "number|string|array|object|null",   
+      "to": "number|string|array|object",   
                                         // required end value
 
       // Aliases (optional, mirror animationFlow)
-      "startValue": "number|string|array|object|null",
-      "endValue":   "number|string|array|object|null",
+      "startValue": "number|string|array|object",
+      "endValue":   "number|string|array|object",
 
       // Documentation
-      "action": "string|null",           // human summary, e.g. "color all paths yellow"
-      "details": "object|string|null",   // any extra props or context
-      "notes": "string|null"             // implementer hints
+      "action": "string",           // human summary, e.g. "color all paths yellow"
+      "details": "object|string",   // any extra props or context
+      "notes": "string"             // implementer hints
     }
     // …add one dict per static change you need…
   ]
@@ -145,46 +144,46 @@
     "type": "tween|spring|wait|custom",  // MC animation type
 
     // Targets
-    "target": "string|array|null",       // Reference/name(s) of animated object(s)
-    "property": "string|array|null",     // 'x', 'fill', ['x','y'], 'fillColor', etc
+    "target": "string|array",       // Reference/name(s) of animated object(s)
+    "property": "string|array",     // 'x', 'fill', ['x','y'], 'fillColor', etc
 
     // Value transitions
-    "from": "number|string|array|object|null",   // Start value(s)
-    "to": "number|string|array|object|null",     // End value(s)
-    "startValue": "number|string|array|object|null", // Alias for compatibility
-    "endValue": "number|string|array|object|null",
+    "from": "number|string|array|object",   // Start value(s)
+    "to": "number|string|array|object",     // End value(s)
+    "startValue": "number|string|array|object", // Alias for compatibility
+    "endValue": "number|string|array|object",
 
     // Duration / time
-    "duration": "number|null",            // In seconds (support float/duration/named)
-    "timingFunction": "string|null",      // Easing, 'easeInOutCubic' etc. Also can specify for springs.
-    "easing": "string|null",              // Alias for compatibility
-    "springType": "string|null",          // For spring animation ('PlopSpring', 'SmoothSpring', etc)
+    "duration": "number",            // In seconds (support float/duration/named)
+    "timingFunction": "string",      // Easing, 'easeInOutCubic' etc. Also can specify for springs.
+    "easing": "string",              // Alias for compatibility
+    "springType": "string",          // For spring animation ('PlopSpring', 'SmoothSpring', etc)
 
     // Tween/step logic
-    "mapping": "string|null",             // e.g., 'map(start, end, easeFn(value))'
-    "stepLogic": "string|object|null",    // Human summary, or actual mapped MC code for value updating
-    "animationFn": "tween|spring|waitFor|edit|all|map|custom|null", // Explicit function if significant
-    "call": "string|null",                // If 'callable', e.g., how the tween or spring is used
+    "mapping": "string",             // e.g., 'map(start, end, easeFn(value))'
+    "stepLogic": "string|object",    // Human summary, or actual mapped MC code for value updating
+    "animationFn": "tween|spring|waitFor|edit|all|map|custom", // Explicit function if significant
+    "call": "string",                // If 'callable', e.g., how the tween or spring is used
 
     // Control/concurrency
-    "concurrency": "single|parallel|sequential|staggered|grouped|none|null", // Execution relation
+    "concurrency": "single|parallel|sequential|staggered|grouped|none", // Execution relation
     "runs": "description of sequence or concurrency",
-    "order": "number|string|null",
+    "order": "number|string",
 
     // Functional or advanced options
-    "tweenCallback": "string|object|null",   // If a callback is used for custom value mapping in tween
-    "easingCurve": "string|array|null",      // e.g. [custom array] if applicable
-    "delays": "array|number|null",           // For staggered/concurrent tweens
-    "labelsOrComments": "array|string|null", // Timeline comments, labels, debug highlights, as present
+    "tweenCallback": "string|object",   // If a callback is used for custom value mapping in tween
+    "easingCurve": "string|array",      // e.g. [custom array] if applicable
+    "delays": "array|number",           // For staggered/concurrent tweens
+    "labelsOrComments": "array|string", // Timeline comments, labels, debug highlights, as present
 
     // Waits and pauses
-    "wait": "number|null",                   // Pause after/before, in seconds
-    "waitType": "waitFor|yield|custom|null", // To clarify wait style if ambiguous
+    "wait": "number",                   // Pause after/before, in seconds
+    "waitType": "waitFor|yield|custom", // To clarify wait style if ambiguous
 
     // Additional
-    "action": "string|null",                 // Human description ("fade out", "move left", etc)
-    "details": "object|string|null",         // Any other MC-specific tweak, mapping, additional callback info.
-    "notes": "string|null"                   // Freeform for implementer ("spring reverses direction", etc)
+    "action": "string",                 // Human description ("fade out", "move left", etc)
+    "details": "object|string",         // Any other MC-specific tweak, mapping, additional callback info.
+    "notes": "string"                   // Freeform for implementer ("spring reverses direction", etc)
   }
   ],
 
@@ -202,15 +201,15 @@
     // Only present in data-rich or chart/graph scenes
     {
       "syntheticData": {
-        "strategy": "string|null",
-        "avgReturn": "string|null",
-        "volatility": "string|null",
-        "weekendHandling": "string|null"
+        "strategy": "string",
+        "avgReturn": "string",
+        "volatility": "string",
+        "weekendHandling": "string"
       },
-      "length": "number|null",
+      "length": "number",
       "mapping": {
-        "X axis (time)": "string|null",
-        "Y axis (value)": "string|null"
+        "X axis (time)": "string",
+        "Y axis (value)": "string"
       }
     }
     // ...add logic notes as present
@@ -220,22 +219,22 @@
     // Optional, only if present in scene: e.g. labels, tracker annotations, timeline comments
     {
       "type": "label|tracker|comment|annotation",
-      "location": "string|null",
-      "text": "string|array|null",
-      "logic": "string|array|null"
+      "location": "string",
+      "text": "string|array",
+      "logic": "string|array"
     }
     // ...add more categories as needed
   ],
 
   "OptionalEnhancements": {
-    "loops": "false|object|string|null",
-    "conditionals": "false|object|string|null",
-    "eventTriggers": "false|object|string|null",
-    "interactivity": "false|object|string|null",
-    "timelineCommentsOrLabels": "false|array|object|null",
-    "timelineAnnotations": "array|object|null",
-    "consoleLogging": "array|object|null",
-    "sceneMetadata": "object|null"
+    "loops": "false|object|string",
+    "conditionals": "false|object|string",
+    "eventTriggers": "false|object|string",
+    "interactivity": "false|object|string",
+    "timelineCommentsOrLabels": "false|array|object",
+    "timelineAnnotations": "array|object",
+    "consoleLogging": "array|object",
+    "sceneMetadata": "object"
   },
 
   "notes": [

@@ -31,11 +31,15 @@ WHEN TO USE THIS TOOL:
 - Perfect for getting high-quality SVG icons from SVG Repo
 - But, currently, I would like you to use this tool to fetch ANY external asset. This is the only currently available tool for fetching external assets, visual icons or image.
 
-HOW TO USE:
+HOW TO USE the Tool:
 - Provide a list of asset names (e.g., "hospital", "person", "dog")
 - The tool will search SVG Repo and fetch corresponding SVG files
 - Icons are saved to the frontend/public directory
 - Returns relative file paths to the downloaded icons
+
+HOW TO USE the Tool's output:
+- The tool returns a list of file paths, with only one file path.
+- You must take this **EXACT FILE PATH** and use it in the call to the Coder Agent tool, be for an update or a write request.
 
 FEATURES:
 - Downloads SVG icons from SVG Repo (svgrepo.com)
@@ -43,16 +47,7 @@ FEATURES:
 - Returns relative file paths for easy integration
 - Handles multiple assets in a single request
 - Fetches up to 3 variations per asset name
-
-LIMITATIONS:
-- Requires internet connection for fetching icons
-- Limited to assets available on SVG Repo
-- May not find exact matches for very specific queries
-
-TIPS:
-- Use descriptive asset names like "home", "user", "settings"
-- Icons are saved as SVG format for scalability
-- Returned paths are relative to project root for easy imports`
+`
 )
 
 func NewSVGRepoTool() BaseTool {
@@ -101,8 +96,8 @@ func (l *SVGRepoTool) Run(ctx context.Context, call ToolCall) (ToolResponse, err
 	for _, asset := range params.Assets {
 		logging.Info("Scraping SVGs for asset", "asset", asset)
 
-		// Scrape up to 3 SVGs per asset
-		svgs, err := scrapesvgs.ScrapeSVG(asset, 3)
+		// Scrape up to 1 SVGs per asset
+		svgs, err := scrapesvgs.ScrapeSVG(asset, 1)
 		if err != nil {
 			logging.Info("Failed to scrape SVGs for asset", "asset", asset, "error", err)
 			continue
@@ -122,7 +117,8 @@ func (l *SVGRepoTool) Run(ctx context.Context, call ToolCall) (ToolResponse, err
 			logging.Info("Successfully saved SVG", "filepath", filepath)
 		}
 	}
-
+	var FilepathListDebug []string
+	FilepathListDebug = append(FilepathListDebug, allFilepaths[0])
 	if totalDownloaded == 0 {
 		return NewTextErrorResponse("No SVG icons were successfully downloaded"), nil
 	}
@@ -130,7 +126,7 @@ func (l *SVGRepoTool) Run(ctx context.Context, call ToolCall) (ToolResponse, err
 	return WithResponseMetadata(
 		NewTextResponse(fmt.Sprintf("Downloaded %d SVG icons to %s directory", totalDownloaded, publicDir)),
 		SVGRepoResponseMetadata{
-			FilesPaths: allFilepaths,
+			FilesPaths: FilepathListDebug,
 		},
 	), nil
 }

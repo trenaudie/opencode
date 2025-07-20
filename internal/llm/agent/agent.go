@@ -406,6 +406,7 @@ func (a *agent) streamAndHandleEvents(ctx context.Context, sessionID string, msg
 			})
 
 			if outputBytes, err := json.Marshal(toolResult.Content); err == nil {
+				logging.Info("logging tool output for ", "toolName", toolCall.Name, "output", string(outputBytes))
 				logging.LogToolOutput(toolCall.Name, string(outputBytes))
 			}
 

@@ -192,14 +192,10 @@ func (o *openaiClient) send(ctx context.Context, messages []message.Message, too
 	cfg := config.Get()
 	if cfg.Debug {
 		jsonData, _ := json.Marshal(params)
-		logging.Info("Prepared messages", "messages", string(jsonData))
 	}
 	attempts := 0
 	for {
 		attempts++
-		// logging.Info("Making OpenAI API call", "model", o.providerOptions.model.APIModel, "system_prompt", o.providerOptions.systemMessage[:1000]+"...."+o.providerOptions.systemMessage[len(o.providerOptions.systemMessage)-1000:], "attempt", attempts, "system_prompt_length", len(o.providerOptions.systemMessage))
-
-		logging.Info("Making OpenAI API call", "model", o.providerOptions.model.APIModel, "attempt", attempts, "system_prompt_length", len(o.providerOptions.systemMessage))
 		// Log system prompt and input to files
 		agentName := o.extractAgentName()
 		logging.LogSystemPrompt(string(agentName), o.providerOptions.systemMessage)
@@ -216,10 +212,6 @@ func (o *openaiClient) send(ctx context.Context, messages []message.Message, too
 			"tools_count":          len(tools),
 			"max_tokens":           o.providerOptions.maxTokens,
 			"attempt":              attempts,
-		}
-
-		for _, msg := range messages {
-			logging.Info("Processing message", "role", msg.Role, "content_length", len(msg.Content().Text), "tool_calls_count", len(msg.ToolCalls()), "tool_results_count", len(msg.ToolResults()))
 		}
 
 		openaiResponse, err := o.client.Chat.Completions.New(
@@ -302,8 +294,6 @@ func (o *openaiClient) stream(ctx context.Context, messages []message.Message, t
 	go func() {
 		for {
 			attempts++
-			// logging.Info("Making OpenAI streaming API call", "model", o.providerOptions.model.APIModel, "attempt", attempts, "system_prompt", o.providerOptions.systemMessage[:1000]+"...."+o.providerOptions.systemMessage[len(o.providerOptions.systemMessage)-1000:], "system_prompt_length", len(o.providerOptions.systemMessage))
-			logging.Info("Making OpenAI API call", "model", o.providerOptions.model.APIModel, "attempt", attempts, "system_prompt_length", len(o.providerOptions.systemMessage))
 			// Log system prompt and input to files
 			agentName := o.extractAgentName()
 			logging.LogSystemPrompt(string(agentName), o.providerOptions.systemMessage)
@@ -323,9 +313,6 @@ func (o *openaiClient) stream(ctx context.Context, messages []message.Message, t
 				"streaming":            true,
 			}
 
-			for _, msg := range messages {
-				logging.Info("Processing streaming message", "role", msg.Role, "content_length", len(msg.Content().Text), "tool_calls_count", len(msg.ToolCalls()), "tool_results_count", len(msg.ToolResults()))
-			}
 			openaiStream := o.client.Chat.Completions.NewStreaming(
 				ctx,
 				params,
