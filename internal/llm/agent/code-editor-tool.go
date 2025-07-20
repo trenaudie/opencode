@@ -14,49 +14,56 @@ import (
 	"github.com/opencode-ai/opencode/internal/session"
 )
 
-type coderUpdateAgentTool struct {
+type codeEditorAgentTool struct {
 	sessions   session.Service
 	messages   message.Service
 	lspClients map[string]*lsp.Client
 }
 
 const (
-	CoderUpdateAgentToolName = "coder"
+	CodeEditorAgentToolName = "coder"
 )
 
-type CoderUpdateAgentParams struct {
+type CodeEditorAgentParams struct {
 	Prompt string `json:"prompt"`
 }
 
-const CoderUpdateAgentDescription = `Coder Update Agent specifically designed to EDIT Motion Canvas scene code, written in Typescript. This agent has no access to additional tools and focuses solely on generating TypeScript code for an existing Motion Canvas scene.
+const CodeEditorAgentDescription = `Code Editor Agent specifically designed to EDIT Motion Canvas scene code IN-PLACE, written in Typescript. This is the EDITOR agent that modifies existing files by providing exact text replacements.
 WHEN TO USE THIS TOOL:
-If the user wants to UPDATE an existing scene, you MUST provide a simple instruction to the coder update agent, telling it specifically what to change, what to remove, and/or what to add. 
-You may give code to the update agent, if you have previously used a view tool, and have knowledge of the scene (example.tsx)
-In your instructions can invent names of functions or attributes if you do not know them, but in that case add a comment to the spec or instruction to the coder agent, so that it can understand that you are unsure about the real name of the function or attribute.
+Use this agent when the user wants to edit, modify, or update an existing Motion Canvas scene. This agent will output old_string (exact text to be replaced) and new_string (exact replacement text) that will be passed to a deterministic edit tool.
+CRITICAL REQUIREMENTS - THE AGENT MUST OUTPUT EXACT STRINGS:
+The orchestrator will use the agent's output with a deterministic edit tool that performs exact string replacement. Therefore:
+- The old_string MUST match the existing file content EXACTLY (including all whitespace, indentation, line breaks)
+- The new_string MUST be the exact replacement text
+- The old_string must be UNIQUE in the file - include enough context (3-5 lines before/after) to ensure uniqueness
+- If old_string appears multiple times, provide more surrounding context to make it unique
+ACCURACY IS CRITICAL - if the strings don't match exactly, the edit will fail.
 HOW TO USE THIS TOOL:
-- provide a simple prompt to the Coder Update Agent, regarding what to change. Explain it in concise and precise text. 
+- Provide clear instructions about what specific code sections need to be changed
+- The agent will analyze the current file and provide exact old_string/new_string pairs for replacement
+- You can mention function/attribute names even if unsure - add comments so the agent understands uncertainty
 `
 
-func (c *coderUpdateAgentTool) Info() tools.ToolInfo {
+func (c *codeEditorAgentTool) Info() tools.ToolInfo {
 	return tools.ToolInfo{
-		Name:        CoderUpdateAgentToolName,
-		Description: CoderUpdateAgentDescription,
+		Name:        CodeEditorAgentToolName,
+		Description: CodeEditorAgentDescription,
 		Parameters: map[string]any{
 			"prompt": map[string]any{
 				"type":        "string",
 				"description": "The coding task for the coder agent to perform, such as creating a specific Motion Canvas animation or component",
 			},
-			"code_to_modify": map[string]any{
-				"type":        "string",
-				"description": "The Motion Canvas scene, written in typescript code, to edit. Most of the code may be working, only an edit of some of the code's lines is necessary.",
-			},
+			// "code_to_modify": map[string]any{
+			// 	"type":        "string",
+			// 	"description": "The Motion Canvas scene, written in typescript code, to edit. Most of the code may be working, only an edit of some of the code's lines is necessary.",
+			// }, do not add this here because it would create unnecessary generations
 		},
 		Required: []string{"prompt"},
 	}
 }
 
-func (c *coderUpdateAgentTool) Run(ctx context.Context, call tools.ToolCall) (tools.ToolResponse, error) {
-	var params CoderUpdateAgentParams
+func (c *codeEditorAgentTool) Run(ctx context.Context, call tools.ToolCall) (tools.ToolResponse, error) {
+	var params CodeEditorAgentParams
 	if err := json.Unmarshal([]byte(call.Input), &params); err != nil {
 		return tools.NewTextErrorResponse(fmt.Sprintf("error parsing parameters: %s", err)), nil
 	}
@@ -117,12 +124,12 @@ func (c *coderUpdateAgentTool) Run(ctx context.Context, call tools.ToolCall) (to
 	return tools.NewTextResponse(response.Content().String()), nil
 }
 
-func NewCoderUpdateAgentTool(
+func NewCodeEditorAgentTool(
 	Sessions session.Service,
 	Messages message.Service,
 	LspClients map[string]*lsp.Client,
 ) tools.BaseTool {
-	return &coderUpdateAgentTool{
+	return &codeEditorAgentTool{
 		sessions:   Sessions,
 		messages:   Messages,
 		lspClients: LspClients,

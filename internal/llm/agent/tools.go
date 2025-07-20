@@ -38,6 +38,7 @@ func OrchestratorAgentTools(
 			tools.NewSVGRepoTool(),
 			// NewAgentTool(sessions, messages, lspClients),
 			NewCoderAgentTool(sessions, messages, lspClients),
+			NewCodeEditorAgentTool(sessions, messages, lspClients),
 		}, otherTools...,
 	)
 }

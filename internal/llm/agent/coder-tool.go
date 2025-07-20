@@ -28,16 +28,17 @@ type CoderAgentParams struct {
 	Prompt string `json:"prompt"`
 }
 
-const CoderAgentDescription = `Coder Agent specifically designed to generate and return Motion Canvas types This agent has no access to additional tools and focuses solely on generating TypeScript code for Motion Canvas projects.
-You will be provided a SPEC FORMAT for the MotionCanvas scenes, in a json format. 
-If you are making a tool call to the coder agent, your tool response for the coder agent can be one of two types:
-- WRITE : If the user wants to WRITE a new scene, you MUST provide a JSON specification, and provide a very detailed json output to the next agent, with optional comments. The next agent should have all the specifications it needs to generate the MotionCanvas scene from scratch. Only provide input code to the coder agent if it is the output of the VIEW tool, ie it is not code that you  . 
-eg. 
-   "{\n  \"prompt\": \"Create a Motion Canvas scene where a triangle-shaped pyramid (an equilateral triangle, currently upside-down) is smoothly flipped so its apex points upward, right side up. Scene style guidelines: \\n- Use only Rect, Node, and Path (NOT Layout) for containers and positioning.\\n- The triangle's points and orientation should be computed reactively with createSignal and createComputed, referencing the parent rect's dimensions for positioning and rotation—avoid hardcoded pixel values whenever possible.\\n- Background should be black via view.fill('#000').\\n- All imports from '@motion-canvas/2d' and '@motion-canvas/core' only.\\n- Animate the triangle flipping over by rotating or morphing the points from the upside-down position to the right-side-up position, using a tween with an ease-in-out timing.\\n- Overwrite the entire content of example.tsx.\\n\\nFull SPEC:\\n{\\n  \\\"title\\\": \\\"Flip Triangle Pyramid Upright\\\",\\n  \\\"description\\\": \\\"An equilateral triangle is shown upside-down in the center. It animates by flipping to point upward, using a rotation or direct vertex morph.\\\",\\n  \\\"sceneMetadata\\\": {\\n    \\\"background\\\": \\\"#000000\\\",\\n    \\\"canvasDefaults\\\": null,\\n    \\\"viewport\\\": null,\\n    \\\"canvasResolution\\\": null,\\n    \\\"other\\\": null\\n  },\\n  \\\"imports\\\": [\\n    ...",
-The SPEC FORMAT that you will be given gives you many fields, but these are optional. Only add a field in the spec that you provide to the coder agent if you have a non-null string value for it that you specifically want. 
-
-- UPDATE : If the user wants to UPDATE an existing scene, you MUST provide a simple instruction to the coder agent WITHOUT the spec. In that case, you MUST also provide the existing typescript code in the example.tsx file, so that the coder agent can understand what to update.
-You can invent names of functions or attributes if you do not know them, but in that case add a comment to the spec or instruction to the coder agent, so that it can understand that you are unsure about the real name of the function or attribute.
+const CoderAgentDescription = `Coder Agent specifically designed to WRITE Motion Canvas scene code from scratch, written in Typescript. This agent has no access to additional tools and focuses solely on generating TypeScript code for Motion Canvas projects.
+WHEN TO USE THIS TOOL:
+Use this agent only when the user wants to create an ENTIRELY NEW scene, or when the discussion has just started with the user and they want a fresh scene. This is the WRITE agent, not the update agent.
+You will be provided a SPEC FORMAT for the MotionCanvas scenes, in a json format.
+To use this tool you MUST provide a JSON specification, and provide a very detailed json output to the next agent, with optional comments. The next agent should have all the specifications it needs to generate the MotionCanvas scene from scratch.
+HOW TO USE THIS TOOL:
+- Provide a detailed JSON specification for creating a new Motion Canvas scene from scratch
+- The SPEC FORMAT may be loosely followed, and you can add comments into, as your tool call will be parsed as text and sent to the coder agent. 
+= The SPEC FORMAT that you will be given gives you many fields, but these are optional. Only add a field in the spec that you provide to the coder agent if you have a non-null string value for it that you specifically want.
+- Include all necessary information for the agent to generate the complete scene
+- You can invent names of functions or attributes if you do not know them, but in that case add a comment to the spec, so that the agent can understand that you are unsure about the real name of the function or attribute.
 `
 
 func (c *coderAgentTool) Info() tools.ToolInfo {
