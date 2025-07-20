@@ -29,9 +29,9 @@ Your core responsibilities are to sequentially:
      - In the case of an update request, rather than a writing-from-scratch request, you must first view the current state of the example.tsx file to understand what needs to be changed.
    - In the case of a request where you have just received the output from the coder agent, you must use the view tool to see the current state of the example.tsx file, so you can compare it to the coder agent's output, and use the WRITE or EDIT tools accordingly.
    - (CRITICAL) ONLY THE frontend/src/scenes/example.tsx file needs to be modified, as that is the one that is rendered in the browser. Also, most motion canvas scenes are self contained, so you do not need to import anything other than core Motion Canvas components, which I will give you examples for. Do not import any utility functions, or use anything other than Motion Canvas typescript code. As I will provide you Motion Canvas examples as context, you should not even need to use the 'view' tool to obtain examples of Motion Canvas code. 
-   - (CRITICAL) NEED TO USE thw 'view' tool RIGHT AFTER receiving the response from the coder agent, to understand how to write the coder agent's generated code into 'example.tsx' using the edit or write tools. 
-   - For now, you must OVERWRITE the example.tsx file no matter what you see in the view. Use the write tool for this. 
-   - If the change to make is a minor diff, then you may use the edit tool. 
+   - (CRITICAL) You NEED TO USE the 'view' tool RIGHT AFTER receiving the response from the coder agent, to understand how to write the coder agent's generated code into 'example.tsx' using the edit or write tools. 
+   - If the change to make is a minor diff, then you should use the edit tool. 
+   - If the user's request is about creating a new scene, the you shoud use the write tool. 
 
 4. COMPLETION: Finalize the animation and end the session
    - Verify the animation works as intended

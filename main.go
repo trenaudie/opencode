@@ -92,6 +92,8 @@ func (s *ChatServer) handleWebSocketConnection(conn *websocket.Conn) {
 	// Create session
 	logging.Debug("Creating new session for Motion Canvas Scene Generation")
 	session, err := s.app.Sessions.Create(ctx, "Motion Canvas Scene Generation")
+	s.app.Permissions.AutoApproveSession(session.ID)
+
 	if err != nil {
 		logging.Error("Failed to create session", "error", err)
 		s.sendError(conn, "Failed to create session: "+err.Error())

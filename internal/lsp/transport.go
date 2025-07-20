@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -11,6 +12,27 @@ import (
 	"github.com/opencode-ai/opencode/internal/config"
 	"github.com/opencode-ai/opencode/internal/logging"
 )
+
+// BrokenPipeError indicates the LSP server connection is broken
+type BrokenPipeError struct {
+	underlying error
+}
+
+func (e *BrokenPipeError) Error() string {
+	return fmt.Sprintf("LSP server connection broken: %v", e.underlying)
+}
+
+func (e *BrokenPipeError) Unwrap() error {
+	return e.underlying
+}
+
+// isBrokenPipe checks if the error indicates a broken pipe connection
+func isBrokenPipe(err error) bool {
+	errStr := strings.ToLower(err.Error())
+	return strings.Contains(errStr, "broken pipe") || 
+		   strings.Contains(errStr, "connection reset") ||
+		   strings.Contains(errStr, "write: connection reset by peer")
+}
 
 // Write writes an LSP message to the given writer
 func WriteMessage(w io.Writer, msg *Message) error {
@@ -26,11 +48,17 @@ func WriteMessage(w io.Writer, msg *Message) error {
 
 	_, err = fmt.Fprintf(w, "Content-Length: %d\r\n\r\n", len(data))
 	if err != nil {
+		if isBrokenPipe(err) {
+			return &BrokenPipeError{underlying: err}
+		}
 		return fmt.Errorf("failed to write header: %w", err)
 	}
 
 	_, err = w.Write(data)
 	if err != nil {
+		if isBrokenPipe(err) {
+			return &BrokenPipeError{underlying: err}
+		}
 		return fmt.Errorf("failed to write message: %w", err)
 	}
 
@@ -98,6 +126,8 @@ func (c *Client) handleMessages() {
 			if cnf.DebugLSP {
 				logging.Error("Error reading message", "error", err)
 			}
+			// Set server state to error when we can't read messages
+			c.SetServerState(StateError)
 			return
 		}
 
@@ -250,6 +280,12 @@ func (c *Client) Call(ctx context.Context, method string, params any, result any
 // Notify sends a notification (a request without an ID that doesn't expect a response)
 func (c *Client) Notify(ctx context.Context, method string, params any) error {
 	cnf := config.Get()
+	
+	// Check server state before sending
+	if c.GetServerState() == StateError {
+		return fmt.Errorf("server is in error state, cannot send notification")
+	}
+	
 	if cnf.DebugLSP {
 		logging.Debug("Sending notification", "method", method)
 	}
@@ -260,6 +296,12 @@ func (c *Client) Notify(ctx context.Context, method string, params any) error {
 	}
 
 	if err := WriteMessage(c.stdin, msg); err != nil {
+		// Handle broken pipe errors specifically
+		var brokenPipeErr *BrokenPipeError
+		if errors.As(err, &brokenPipeErr) {
+			c.SetServerState(StateError)
+			return fmt.Errorf("LSP server connection lost: %w", brokenPipeErr)
+		}
 		return fmt.Errorf("failed to send notification: %w", err)
 	}
 
