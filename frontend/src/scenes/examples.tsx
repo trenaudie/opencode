@@ -1,5 +1,5 @@
 import { Rect, makeScene2D } from '@motion-canvas/2d';
-import { createSignal, all, waitFor ,createRef} from '@motion-canvas/core';
+import { createSignal, all, waitFor } from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
   // Set the background color of the view
@@ -12,7 +12,7 @@ export default makeScene2D(function* (view) {
   const squareRef = createRef<Rect>();
   view.add(
     <Rect
-      ref={squareRef()}
+      ref={squareRef}
       x={() => 0} // Centered in x
       y={() => 0} // Centered in y
       width={() => 240} // Fixed width

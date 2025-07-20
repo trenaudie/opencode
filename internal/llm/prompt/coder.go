@@ -1329,6 +1329,36 @@ circle_positions.push(new Vector2(x * 500, y * 300))
 let iteration = 0 ;
 yield* tween(100/60, (value) => {iteration +=1 ;circle().position(circle_positions[iteration])})
 });
+import {Circle, makeScene2D} from '@motion-canvas/2d';
+import {Vector2, createRef, easeInOutCubic, tween} from '@motion-canvas/core';
+
+export default makeScene2D(function* (view) {
+  const circle = createRef<Circle>();
+
+  view.add(
+    <Circle
+      //highlight-start
+      ref={circle}
+      x={-300}
+      y={200}
+      width={240}
+      height={240}
+      fill="#e13238"
+    />,
+  );
+  //highlight-start
+  yield* tween(2, value => {
+    circle().position(
+      Vector2.arcLerp(
+        new Vector2(-300, 200),
+        new Vector2(300, -200),
+        easeInOutCubic(value),
+      ),
+    );
+  });
+  //highlight-end
+});
+
 `
 
 const baseAnthropicCoderPrompt = `You are OpenCode, an interactive CLI tool that helps users with software engineering tasks. Use the instructions below and the tools available to you to assist the user.

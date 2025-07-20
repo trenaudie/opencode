@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -397,6 +398,11 @@ func (a *agent) streamAndHandleEvents(ctx context.Context, sessionID string, msg
 				Name:  toolCall.Name,
 				Input: toolCall.Input,
 			})
+
+			if outputBytes, err := json.Marshal(toolResult.Content); err == nil {
+				logging.LogToolOutput(toolCall.Name, string(outputBytes))
+			}
+
 			if toolErr != nil {
 				if errors.Is(toolErr, permission.ErrorPermissionDenied) {
 					toolResults[i] = message.ToolResult{

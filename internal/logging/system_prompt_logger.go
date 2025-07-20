@@ -82,7 +82,7 @@ func LogSystemPrompt(agentName string, systemPrompt string) {
 
 	// Create timestamp for filename
 	timestamp := time.Now().Format("2006-01-02_15-04-05")
-	filename := fmt.Sprintf("%s_%s.txt", agentName, timestamp)
+	filename := fmt.Sprintf("%s_%s.txt", timestamp, agentName)
 	filepath := filepath.Join("logs", "system_prompts_used", filename)
 
 	// Write system prompt to file
@@ -131,7 +131,7 @@ func LogOutput(agentName string, content string, toolCalls interface{}) {
 
 	// Create timestamp for filename
 	timestamp := time.Now().Format("2006-01-02_15-04-05")
-	filename := fmt.Sprintf("%s_%s.txt", agentName, timestamp)
+	filename := fmt.Sprintf("%s_%s.txt", timestamp, agentName)
 	filepath := filepath.Join("logs", "output", filename)
 
 	var outputContent string
@@ -160,6 +160,30 @@ func LogOutput(agentName string, content string, toolCalls interface{}) {
 	}
 
 	Debug("Output logged", "filepath", filepath, "agent", agentName, "content_length", len(outputContent))
+}
+
+// For tool calls, it marshals the data to JSON with indentation
+func LogToolOutput(toolName string, content string) {
+
+	// Create timestamp for filename
+	timestamp := time.Now().Format("2006-01-02_15-04-05")
+	filename := fmt.Sprintf("%s_%s.txt", toolName, timestamp)
+	filepath := filepath.Join("logs", "output", filename)
+
+	var outputContent string
+	outputContent += "Tool " + toolName
+	outputContent += "Tool Output : \n"
+	outputContent += content
+
+	// If there are tool calls, format as JSON
+
+	// Write output content to file
+	if err := os.WriteFile(filepath, []byte(outputContent), 0644); err != nil {
+		Warn("Failed to write output to file", "error", err, "filepath", filepath, "tool", toolName)
+		return
+	}
+
+	Debug("Output logged", "filepath", filepath, "agent", toolName, "content_length", len(outputContent))
 }
 
 // LogAgentCall logs an agent tool call invocation to the JSONL log file

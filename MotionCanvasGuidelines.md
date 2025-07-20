@@ -44,14 +44,13 @@
       InterpolationFunction
     } from '@motion-canvas/core';
 
-  6. **OUTPUT**
-    (CRITICAL) 
-    You must ultimately output the written .tsx file to the frontend/src/scenes/example.tsx file. It already exists, but you must call the tool to edit it. 
+    7. **Animation Flow**  
+     - See the animations in the specs below. Avoid if possible to use tweens, as they are complex objects to code. 
 
 
 I will provide you with a spec format for the Motion Canva code. A motion canvas scene should implement the features of the spec, but is not required to implement every feature. 
 If you want to give instructions for generating Motion Canvas code, you MUST use the spec as a template for said instructions. 
-I may provide you some exmaples of Motion Canvas Code, for you to see the syntax and these guidelines in practice. 
+I may also provide you some exmaples of Motion Canvas Code, for you to see the syntax and these guidelines in practice. 
 
 ## SPEC FORMAT : 
 {
