@@ -1,35 +1,25 @@
 import { Rect, makeScene2D } from '@motion-canvas/2d';
-import { createSignal, all, waitFor ,createRef} from '@motion-canvas/core';
+import { createRef } from '@motion-canvas/core';
 
 export default makeScene2D(function* (view) {
-  // Set the background color of the view
+  // Set the background color
   view.fill('#000000');
 
-  // Create a signal to hold the scale value of the square
-  const scale = createSignal(0.4); // Start small
+  // Create references for the rectangle
+  const rectRef = createRef<Rect>();
 
-  // Add the square to the scene
-  const squareRef = createRef<Rect>();
+  // Reactive dimensions
+  const rectWidth = () => view.width() * 0.8;  // 80% of the view's width
+  const rectHeight = () => view.height() * 0.2; // 20% of the view's height
+
+  // Add the rectangle to the view
   view.add(
     <Rect
-      ref={squareRef()}
-      x={() => 0} // Centered in x
-      y={() => 0} // Centered in y
-      width={() => 240} // Fixed width
-      height={() => 240} // Fixed height
-      fill={'#3485E7'} // Square fill color
-      stroke={'#FFFFFF'} // Square stroke color
-      lineWidth={8} // Stroke width
-      scale={scale} // Reactive scale
+      ref={rectRef}
+      width={rectWidth}
+      height={rectHeight}
+      fill={'#3498db'} // Filling with a visible blue color
+      position={[0, 0]} // Centered in the view
     />
-  );
-
-  // Wait a moment to ensure everything is rendered
-  yield* waitFor(0.2);
-
-  // Animate: scale up the square from 0.4 to 1.0
-  yield* all(
-    squareRef().scale(0.4, 0), // Start small
-    squareRef().scale(1.0, 1.2) // Scale up over 1.2 seconds
   );
 });

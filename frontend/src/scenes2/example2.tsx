@@ -1,4 +1,4 @@
-import {Circle, Rect, makeScene2D} from '@motion-canvas/2d';
+exampleimport {Circle, Rect, makeScene2D} from '@motion-canvas/2d';
 import {
   all,
   createRef,
