@@ -16,7 +16,11 @@
       "name": "string|array",
       "from": "string (import source module)"
     }
-    // ...one object per import
+    {
+      "type": "asset/svg-raw",
+      "name": "string|array",             // e.g. "logo" or ["iconA","iconB"]
+      "from": "string (must end in '?raw')" // e.g. "/public/logo.svg?raw"
+    }
   ],
 
   "objectInitialization": [
@@ -67,6 +71,7 @@
       "staticStyling": "object|string|null",
       "children": "array|null",    // (Repeat objectInitialization format, supports deep nesting)
       "count": "number|null"       // If this object is a group/array
+
     }
     // ...more as needed by scene
   ],
@@ -103,6 +108,35 @@
       "string"
     ]
   },
+  "contentManipulation": [
+    {
+      "step": "number|string",           // order or phase (e.g. 1, "init", etc.)
+
+      "type": "string",                  // e.g. "set" | "edit" | "custom"
+                                        // analogous to animationFlow.type but no timing
+      // Targets
+      "target": "string|array|null",     // ref name(s) or selector(s) of node(s)
+      "property": "string|array|null",   // e.g. "fill", ["fill","stroke"], "opacity"
+
+      // Value assignment
+      "from": "number|string|array|object|null", 
+                                        // optional start value (for clarity)
+      "to": "number|string|array|object|null",   
+                                        // required end value
+
+      // Aliases (optional, mirror animationFlow)
+      "startValue": "number|string|array|object|null",
+      "endValue":   "number|string|array|object|null",
+
+      // Documentation
+      "action": "string|null",           // human summary, e.g. "color all paths yellow"
+      "details": "object|string|null",   // any extra props or context
+      "notes": "string|null"             // implementer hints
+    }
+    // …add one dict per static change you need…
+  ]
+
+  }
 
   "animationFlow": [
     // Each animation step or phase as an object (order in array = time order in scene)

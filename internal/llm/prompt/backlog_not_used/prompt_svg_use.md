@@ -1,3 +1,9 @@
+
+Here is a good representation of how to use SVGs.
+The SVGs must be imported as a raw string from the public dir, using the '?raw' flag
+Always use the following format import logo from '/public/<svgname>.svg?raw';
+eg. import logo from '/public/logo.svg?raw';
+CRITICAL: You must select the Path children of the SVG and fill them with a color. Use a FOR loop for this. See below.
 import {
   Rect,
   Node,
@@ -80,3 +86,10 @@ export default makeScene2D(function* (view) {
     );
   }
 });
+
+
+This is also a good representation of how you can position points one to another, you must always give the x={} and y={} position relative to the PARENT element. So, for example, if you want object A to have a position that depends on object B that is not the parent, one option is:
+1. to fetch the ABSOLUTE position of object B. eg. objectBAbsPos = objectBRef().absolutePosition()
+2. convert it to the local coordinates of the PARENT of object A. eg. objectBAbsPos_inParentcoords = objectBAbsPos.transformAsPoint(objectARef().worldToParent())
+3. add the offset that you want to create between the two objects. eg. objectAPos = objectBAbsPos_inParentcoords.add(new Vector2([0,200]))
+`
