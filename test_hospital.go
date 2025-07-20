@@ -7,7 +7,7 @@ import (
 	"github.com/opencode-ai/opencode/scrape_svgs"
 )
 
-func main() {
+func testHospital() {
 	fmt.Println("Testing ScrapeSVG function with query 'hospital'...")
 	
 	svgs, err := scrapesvgs.ScrapeSVG("hospital", 3)

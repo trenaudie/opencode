@@ -50,3 +50,4 @@ main
 
 #frontend - downloaded assets 
 frontend/public/*.svg
+logs/tool_info/

@@ -15,7 +15,7 @@ var toolcall = tools.ToolCall{
 	Input: `{"assets": ["hospital", "person", "dog"]}`,
 }
 
-func main() {
+func testLucidIcons() {
 	var ToolResponse, err = lucid_icons_tool.Run(ctx, toolcall)
 	logging.Info("Tool Response", "response", ToolResponse, "error", err)
 

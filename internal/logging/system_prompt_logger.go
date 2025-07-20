@@ -28,7 +28,7 @@ func InitSystemPromptLogging() error {
 		"logs/system_prompts_used",
 		"logs/input",
 		"logs/output",
-		"logs/agent_calls",
+		"logs/tool_info",
 	}
 
 	for _, logsDir := range logDirs {

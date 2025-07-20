@@ -236,8 +236,8 @@ func main() {
 		logging.ErrorPersist("Application terminated due to unhandled panic")
 	})
 
-	logging.InitGlobalLogging("app.log")
-	
+	logging.InitGlobalLogging("logapp.log")
+
 	// Initialize system prompt logging directory (cleans on restart)
 	if err := logging.InitSystemPromptLogging(); err != nil {
 		logging.Error("Failed to initialize system prompt logging", "error", err)

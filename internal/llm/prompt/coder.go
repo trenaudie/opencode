@@ -1335,31 +1335,17 @@ export default makeScene2D(function* (view) {
   
   yield* circle().fill('#e13238', 1);
   yield* circle2().fill('#e13238', 1);
-});import {Circle, makeScene2D} from '@motion-canvas/2d';
-import {createRef, easeOutSine, map, tween, Vector2} from '@motion-canvas/core';
-import { Color } from '@motion-canvas/core';
-import { easeInOutCubic } from '@motion-canvas/core';
-import {arcLerp} from '@motion-canvas/core';
-
-
-
-export default makeScene2D(function* (view) {
-  const circle = createRef<Circle>();
-  const circle_positions: Vector2[] = []
-  for (let i = 0; i <= 100; i++) {
-    const x = i / 100;
-    const y = easeInOutCubic(x); // Replace with any easing function
-    circle_positions.push(new Vector2(x * 500, y * 300))
-  }
-let iteration = 0 ;
-yield*  tween(100/60,   (value) => {iteration +=1 ;circle().position(circle_positions[iteration])})
 });
+
+
 
 Here is a good representation of how to use SVGs.
 The SVGs must be imported as a raw string from the public dir, using the '?raw' flag
 Always use the following format import logo from '/public/<svgname>.svg?raw';
 eg. import logo from '/public/logo.svg?raw';
-CRITICAL: You must select the Path children of the SVG and fill them with a color. Use a FOR loop for this. See below.
+The SVG MUST be imported using "import SVG from '@motion-canvas/2d'"
+The SVG JSX component must be in all caps : <SVG .... />
+Here is an example of such a scene.
 import {
   Rect,
   Node,

@@ -1,82 +1,37 @@
-import {
-  Rect,
-  Node,
-  makeScene2D, SVG,Path
-} from '@motion-canvas/2d';
-import {
-  createSignal,
-  createRef,
-  all,
-  waitFor,
-  linear,
-  Vector2
-} from '@motion-canvas/core';
-import logo from '/public/logo.svg?raw';
-console.log(`found logo ${logo}`)
-const numRows = 5;
-const baseWidth = 560;
-const widthStep = 80;
-const boxHeight = 48;
-const gap = 8;
+import { Rect, SVG, makeScene2D } from '@motion-canvas/2d';
+import { createRef, createSignal, createComputed, all, waitFor, easeInOutCubic } from '@motion-canvas/core';
+import hospitalSvg from '/public/hospital.svg?raw';
 
 export default makeScene2D(function* (view) {
-  // Set background color
-  view.fill('#000000');
+  view.fill('#000000'); // Set the background to black
 
-  // Refs for rectangles and signals for opacity
-  const rectRefs = Array.from({ length: numRows }, () => createRef<Rect>());
-  const rectSignals = Array.from({ length: numRows }, () => createSignal(0));
-  const logoRef = createRef<SVG>();
-  // Main container Node to stack rectangles
-  const container = createRef<Node>();
-  const gap_between_last_rectangle_and_svg_y = 250;
+  // Create signals for dynamic properties
+  const iconScale = createSignal(0);
+
+  // Create a parent rectangle that is center-anchored
+  const parentRect = createRef<Rect>();
+  const hospitalIcon = createRef<SVG>();
+
   view.add(
-    <>
-  <Node ref={container}>
-      {Array.from({ length: numRows }, (_, i) => {
-        const width = baseWidth - i * widthStep;
-        const y = () => (i * (boxHeight + gap)) - (numRows * (boxHeight + gap) / 2) + (boxHeight / 2);
-
-        return (
-          <Rect
-            ref={rectRefs[i]}
-            width={width}
-            height={boxHeight}
-            fill={'#6cf1c2'}
-            y={y}
-            opacity={rectSignals[i]} // opacity controlled by signal
-          />
-        );
-      })}
-    </Node>
-      <SVG ref={logoRef} svg={logo.replace("@color", "#f2ff48")} size = {300}  position= {() => {
-        let svg_world_to_parent = logoRef().worldToParent();
-      console.log(`the last child of the container is ${container().children().at(-1).absolutePosition()}`);
-            console.log(`which, converting to the Parent of the SVG means: ${svg_world_to_parent.transformPoint(container().children().at(-1).absolutePosition())}`);
-            let gap_between_last_rectangle_and_svg_vector =  new Vector2(0, gap_between_last_rectangle_and_svg_y);
-            console.log(`gap is ${gap_between_last_rectangle_and_svg_vector}`)
-    return container().children().at(-1).absolutePosition().transformAsPoint(svg_world_to_parent).add(gap_between_last_rectangle_and_svg_vector)
-    }}/>
-  </>
-    
+    <Rect 
+      ref={parentRect}
+      width={() => view.width() * 0.6}
+      height={() => view.height() * 0.6}
+      fill={null} // No fill for the parent rect
+    >
+      <SVG 
+        ref={hospitalIcon}
+        svg={hospitalSvg}
+        width={() => parentRect().width() * 0.6}
+        height={() => parentRect().height() * 0.6}
+        scale={() => iconScale()} // Scale based on iconScale signal
+      />
+    </Rect>
   );
-  // Animate SVG elements
-  const svgElements = [logoRef()]
-  const animations = [];
-  for (const svgElement of svgElements) {
-    animations.push(svgElement.scale(1, .5));
-    animations.push(svgElement.opacity(1, .5));
-    for (const child of svgElement.children()[0].children()) {
-      if (child instanceof Path) {
-        yield* child.fill('white',1);
-      }
-    }
-  }
-  // Fade in rectangles one by one
-  for (let i = 0; i < numRows; i++) {
-    yield* all(
-      rectSignals[i](1, 0.5, linear), // Fade to opaque
-      waitFor(0.2) // Wait before next rectangle
-    );
-  }
+
+  // Animate the scale of the icon from 0 to 1
+  yield* all(
+    iconScale(1, 1.2, easeInOutCubic), // Scale in the hospital icon
+    waitFor(0.5) // Optional wait before the next action
+  );
 });
