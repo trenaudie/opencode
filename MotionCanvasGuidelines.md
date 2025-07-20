@@ -272,6 +272,21 @@ The SVGs must be imported as a raw string from the public dir, using the '?raw' 
 Always use the following format import logo from '/public/<svgname>.svg?raw';
 eg. import logo from '/public/logo.svg?raw';
 CRITICAL: You must select the Path children of the SVG and fill them with a color. Use a FOR loop for this. See below.
+CRITICAL: The svg path elements must be filled with a color. Use this syntax, ie iterating through the SVG's child Node element's children using : svgElement.children()[0].children(). 
+Here is the code to animate SVG elements if you have multiple.
+  // Animate SVG elements
+  const svgElements = [logoRef(),hospitalRef()]
+  const animations = [];
+  for (const svgElement of svgElements) {
+    animations.push(svgElement.scale(1, .5));
+    animations.push(svgElement.opacity(1, .5));
+    for (const child of svgElement.children()[0].children()) {
+      if (child instanceof Path) {
+        yield* child.fill('white',1);
+      }
+    }
+  }
+Here is an example of a scene that does this well
 import {
   Rect,
   Node,

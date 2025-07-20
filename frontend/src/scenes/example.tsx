@@ -1,37 +1,41 @@
-import { Rect, SVG, makeScene2D } from '@motion-canvas/2d';
-import { createRef, createSignal, createComputed, all, waitFor, easeInOutCubic } from '@motion-canvas/core';
-import hospitalSvg from '/public/hospital.svg?raw';
+import { makeScene2D, Rect, Node, SVG, Path } from '@motion-canvas/2d';
+import {  createRef, createSignal, all, waitFor , easeOutBack} from '@motion-canvas/core';
+import hospitalSVG from '/public/hospital_1.svg?raw';
 
 export default makeScene2D(function* (view) {
-  view.fill('#000000'); // Set the background to black
+  // Set background color
+  view.fill('#000000');
 
-  // Create signals for dynamic properties
-  const iconScale = createSignal(0);
+  // Create a reference for the container and the SVG
+  const container = createRef<Rect>();
+  const svgRef = createRef<SVG>();
 
-  // Create a parent rectangle that is center-anchored
-  const parentRect = createRef<Rect>();
-  const hospitalIcon = createRef<SVG>();
-
+  // Initialize the container
   view.add(
-    <Rect 
-      ref={parentRect}
-      width={() => view.width() * 0.6}
-      height={() => view.height() * 0.6}
-      fill={null} // No fill for the parent rect
+    <Rect
+      ref={container}
+      width={400}
+      height={400}
     >
-      <SVG 
-        ref={hospitalIcon}
-        svg={hospitalSvg}
-        width={() => parentRect().width() * 0.6}
-        height={() => parentRect().height() * 0.6}
-        scale={() => iconScale()} // Scale based on iconScale signal
+      <SVG
+        ref={svgRef}
+        svg={hospitalSVG}
+        size={300} // Set base size
+        scale={0} // Start scaled down
+        opacity={1}
       />
     </Rect>
   );
 
-  // Animate the scale of the icon from 0 to 1
-  yield* all(
-    iconScale(1, 1.2, easeInOutCubic), // Scale in the hospital icon
-    waitFor(0.5) // Optional wait before the next action
-  );
+  // Animation: Pop in the hospital icon
+  yield* svgRef().scale(1, 0.9, easeOutBack); // Scale up the SVG from zero
+
+  // Animate the paths filling from gray to white
+  const paths = svgRef().children().filter(child => child instanceof Path);
+  for (const path of paths) {
+    console.log('Animating path:', path);
+    yield* path.fill('gray', 0); // Set initial fill to gray
+    yield* path.fill('white', 0.3); // Animate fill to white
+    yield* waitFor(0.1); // Wait slightly between fills
+  }
 });

@@ -7,16 +7,16 @@ import (
 	"github.com/opencode-ai/opencode/internal/logging"
 )
 
-var lucid_icons_tool = &tools.LucidIconsTool{}
+var svg_repo_tool = &tools.SVGRepoTool{}
 var ctx = context.Background()
 var toolcall = tools.ToolCall{
-	ID:    "test_lucid_icons",
-	Name:  "lucid_icons",
+	ID:    "test_svg_repo",
+	Name:  "svg_repo",
 	Input: `{"assets": ["hospital", "person", "dog"]}`,
 }
 
-func testLucidIcons() {
-	var ToolResponse, err = lucid_icons_tool.Run(ctx, toolcall)
+func testSVGRepo() {
+	var ToolResponse, err = svg_repo_tool.Run(ctx, toolcall)
 	logging.Info("Tool Response", "response", ToolResponse, "error", err)
 
 }

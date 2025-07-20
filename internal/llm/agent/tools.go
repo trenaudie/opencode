@@ -35,7 +35,7 @@ func OrchestratorAgentTools(
 			tools.NewViewTool(lspClients),
 			// tools.NewPatchTool(lspClients, permissions, history),
 			tools.NewWriteTool(lspClients, permissions, history),
-			tools.NewLucidIconsTool(),
+			tools.NewSVGRepoTool(),
 			// NewAgentTool(sessions, messages, lspClients),
 			NewCoderAgentTool(sessions, messages, lspClients),
 		}, otherTools...,

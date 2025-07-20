@@ -12,24 +12,24 @@ import (
 	scrapesvgs "github.com/opencode-ai/opencode/scrape_svgs"
 )
 
-type LucidIconsTool struct{}
+type SVGRepoTool struct{}
 
-type LucidIconsParams struct {
+type SVGRepoParams struct {
 	Assets []string `json:"assets"`
 }
 
-type LucidIconsResponseMetadata struct {
+type SVGRepoResponseMetadata struct {
 	FilesPaths []string `json:"filepaths"`
 }
 
 const (
-	LucidIconsToolName = "lucid_icons"
-	lucidIconsDescription = `Icon asset fetching tool that downloads SVG icons from SVG Repo based on asset names.
+	SVGRepoToolName    = "svg_repo_fetcher"
+	SVGRepoDescription = `Icon asset fetching tool that downloads SVG icons from SVG Repo based on asset names.
 
 WHEN TO USE THIS TOOL:
 - Use when you need to download icon assets for your frontend application
 - Perfect for getting high-quality SVG icons from SVG Repo
-- Use when building UI components that need visual icons
+- But, currently, I would like you to use this tool to fetch ANY external asset. This is the only currently available tool for fetching external assets, visual icons or image.
 
 HOW TO USE:
 - Provide a list of asset names (e.g., "hospital", "person", "dog")
@@ -55,14 +55,14 @@ TIPS:
 - Returned paths are relative to project root for easy imports`
 )
 
-func NewLucidIconsTool() BaseTool {
-	return &LucidIconsTool{}
+func NewSVGRepoTool() BaseTool {
+	return &SVGRepoTool{}
 }
 
-func (l *LucidIconsTool) Info() ToolInfo {
+func (l *SVGRepoTool) Info() ToolInfo {
 	return ToolInfo{
-		Name:        LucidIconsToolName,
-		Description: lucidIconsDescription,
+		Name:        SVGRepoToolName,
+		Description: SVGRepoDescription,
 		Parameters: map[string]any{
 			"assets": map[string]any{
 				"type":        "array",
@@ -76,9 +76,9 @@ func (l *LucidIconsTool) Info() ToolInfo {
 	}
 }
 
-func (l *LucidIconsTool) Run(ctx context.Context, call ToolCall) (ToolResponse, error) {
-	var params LucidIconsParams
-	logging.Debug("lucid_icons tool params", "params", call.Input)
+func (l *SVGRepoTool) Run(ctx context.Context, call ToolCall) (ToolResponse, error) {
+	var params SVGRepoParams
+	logging.Debug("svg repo tool params", "params", call.Input)
 	if err := json.Unmarshal([]byte(call.Input), &params); err != nil {
 		return NewTextErrorResponse(fmt.Sprintf("error parsing parameters: %s", err)), nil
 	}
@@ -87,49 +87,49 @@ func (l *LucidIconsTool) Run(ctx context.Context, call ToolCall) (ToolResponse, 
 		return NewTextErrorResponse("assets list is required"), nil
 	}
 
-	logging.Info("Received LucidIconsTool call with assets", "assets", params.Assets)
-	
+	logging.Info("Received SVGRepoTool call with assets", "assets", params.Assets)
+
 	// Create frontend/public directory if it doesn't exist
 	publicDir := "frontend/public"
 	if err := os.MkdirAll(publicDir, 0755); err != nil {
 		return NewTextErrorResponse(fmt.Sprintf("failed to create directory: %s", err)), nil
 	}
-	
+
 	var allFilepaths []string
 	totalDownloaded := 0
-	
+
 	for _, asset := range params.Assets {
 		logging.Info("Scraping SVGs for asset", "asset", asset)
-		
+
 		// Scrape up to 3 SVGs per asset
 		svgs, err := scrapesvgs.ScrapeSVG(asset, 3)
 		if err != nil {
 			logging.Info("Failed to scrape SVGs for asset", "asset", asset, "error", err)
 			continue
 		}
-		
+
 		for i, svgContent := range svgs {
 			filename := fmt.Sprintf("%s_%d.svg", strings.ReplaceAll(asset, " ", "_"), i+1)
 			filepath := filepath.Join(publicDir, filename)
-			
+
 			if err := os.WriteFile(filepath, []byte(svgContent), 0644); err != nil {
 				logging.Info("Failed to write SVG file", "filepath", filepath, "error", err)
 				continue
 			}
-			
+
 			allFilepaths = append(allFilepaths, filepath)
 			totalDownloaded++
 			logging.Info("Successfully saved SVG", "filepath", filepath)
 		}
 	}
-	
+
 	if totalDownloaded == 0 {
 		return NewTextErrorResponse("No SVG icons were successfully downloaded"), nil
 	}
-	
+
 	return WithResponseMetadata(
 		NewTextResponse(fmt.Sprintf("Downloaded %d SVG icons to %s directory", totalDownloaded, publicDir)),
-		LucidIconsResponseMetadata{
+		SVGRepoResponseMetadata{
 			FilesPaths: allFilepaths,
 		},
 	), nil
