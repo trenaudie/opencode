@@ -400,6 +400,7 @@ func (a *agent) streamAndHandleEvents(ctx context.Context, sessionID string, msg
 				}
 				continue
 			}
+			logging.Info("Running tool", "toolName", toolCall.Name, "input", toolCall.Input[:min(100, len(toolCall.Input))])
 			toolResult, toolErr := tool.Run(ctx, tools.ToolCall{
 				ID:    toolCall.ID,
 				Name:  toolCall.Name,
@@ -452,7 +453,7 @@ out:
 	if err != nil {
 		return assistantMsg, nil, fmt.Errorf("failed to create cancelled tool message: %w", err)
 	}
-	logging.Info(fmt.Sprintf("%d tool results and %d parts added to new tool results message", len(toolResults), len(parts)))
+	// logging.Info(fmt.Sprintf("%d tool results and %d parts added to new tool results message", len(toolResults), len(parts)))
 	return assistantMsg, &msg, err
 }
 

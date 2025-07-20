@@ -98,15 +98,11 @@ func (v *viewTool) Info() ToolInfo {
 // Run implements Tool.
 func (v *viewTool) Run(ctx context.Context, call ToolCall) (ToolResponse, error) {
 	var params ViewParams
-	logging.Debug("view tool params", "params", call.Input)
 	if err := json.Unmarshal([]byte(call.Input), &params); err != nil {
-		logging.Error("view tool failed to parse params", "error", err, "input", call.Input)
 		return NewTextErrorResponse(fmt.Sprintf("error parsing parameters: %s", err)), nil
 	}
-	logging.Debug("view tool parsed params successfully", "file_path", params.FilePath, "offset", params.Offset, "limit", params.Limit)
 
 	if params.FilePath == "" {
-		logging.Error("view tool missing file_path parameter")
 		return NewTextErrorResponse("file_path is required"), nil
 	}
 
@@ -114,13 +110,10 @@ func (v *viewTool) Run(ctx context.Context, call ToolCall) (ToolResponse, error)
 	filePath := params.FilePath
 	if !filepath.IsAbs(filePath) {
 		filePath = filepath.Join(config.WorkingDirectory(), filePath)
-		logging.Debug("view tool converted relative path to absolute", "original", params.FilePath, "absolute", filePath)
 	} else {
-		logging.Debug("view tool using absolute path", "file_path", filePath)
 	}
 
 	// Check if file exists
-	logging.Debug("view tool checking if file exists", "file_path", filePath)
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {

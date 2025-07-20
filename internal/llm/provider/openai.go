@@ -230,9 +230,7 @@ func (o *openaiClient) send(ctx context.Context, messages []message.Message, too
 			params,
 		)
 		if err == nil && openaiResponse != nil && len(openaiResponse.Choices) > 0 {
-			logging.Info("OpenAI API call completed", "content_length", len(openaiResponse.Choices[0].Message.Content), "finish_reason", openaiResponse.Choices[0].FinishReason, "tool_calls_count", len(openaiResponse.Choices[0].Message.ToolCalls))
 		} else {
-			logging.Info("OpenAI API call failed", "error", err)
 		}
 		// If there is an error we are going to see if we can retry the call
 		if err != nil {
@@ -347,7 +345,6 @@ func (o *openaiClient) stream(ctx context.Context, messages []message.Message, t
 					}
 				}
 			}
-			logging.Info("finished streaming , so here is the content full:", currentContent)
 			jsonData, err1 := json.Marshal(acc.ChatCompletion)
 			if err1 != nil {
 				logging.Error("Failed to marshal JSON", "error", err1)
@@ -365,8 +362,6 @@ func (o *openaiClient) stream(ctx context.Context, messages []message.Message, t
 				if len(toolCalls) > 0 {
 					finishReason = message.FinishReasonToolUse
 				}
-
-				logging.Info("OpenAI streaming API call completed", "content_length", len(currentContent), "finish_reason", finishReason, "tool_calls_count", len(toolCalls))
 
 				// Log output content and tool calls
 				logging.LogOutput(string(agentName), currentContent, toolCalls)
