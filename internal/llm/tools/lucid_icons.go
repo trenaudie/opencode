@@ -4,8 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/opencode-ai/opencode/internal/logging"
+	scrapesvgs "github.com/opencode-ai/opencode/scrape_svgs"
 )
 
 type LucidIconsTool struct{}
@@ -20,29 +24,30 @@ type LucidIconsResponseMetadata struct {
 
 const (
 	LucidIconsToolName = "lucid_icons"
-	lucidIconsDescription = `Icon asset fetching tool that downloads Lucid icons as SVG files based on asset names.
+	lucidIconsDescription = `Icon asset fetching tool that downloads SVG icons from SVG Repo based on asset names.
 
 WHEN TO USE THIS TOOL:
 - Use when you need to download icon assets for your frontend application
-- Perfect for getting consistent, high-quality SVG icons from the Lucid icon library
+- Perfect for getting high-quality SVG icons from SVG Repo
 - Use when building UI components that need visual icons
 
 HOW TO USE:
 - Provide a list of asset names (e.g., "hospital", "person", "dog")
-- The tool will fetch corresponding Lucid icons as SVG files
+- The tool will search SVG Repo and fetch corresponding SVG files
 - Icons are saved to the frontend/public directory
 - Returns relative file paths to the downloaded icons
 
 FEATURES:
-- Downloads SVG icons from Lucid icon library
+- Downloads SVG icons from SVG Repo (svgrepo.com)
 - Saves icons to frontend/public directory for web usage
 - Returns relative file paths for easy integration
 - Handles multiple assets in a single request
+- Fetches up to 3 variations per asset name
 
 LIMITATIONS:
-- Currently returns hardcoded paths (implementation in progress)
 - Requires internet connection for fetching icons
-- Limited to Lucid icon library assets
+- Limited to assets available on SVG Repo
+- May not find exact matches for very specific queries
 
 TIPS:
 - Use descriptive asset names like "home", "user", "settings"
@@ -84,18 +89,48 @@ func (l *LucidIconsTool) Run(ctx context.Context, call ToolCall) (ToolResponse, 
 
 	logging.Info("Received LucidIconsTool call with assets", "assets", params.Assets)
 	
-	// TODO: Implement actual icon fetching logic
-	// For now, return hardcoded paths as requested
-	filepaths := []string{
-		"frontend/public/logo.svg",
-		"frontend/public/grid.png",
-		"frontend/public/placeholder.png",
+	// Create frontend/public directory if it doesn't exist
+	publicDir := "frontend/public"
+	if err := os.MkdirAll(publicDir, 0755); err != nil {
+		return NewTextErrorResponse(fmt.Sprintf("failed to create directory: %s", err)), nil
+	}
+	
+	var allFilepaths []string
+	totalDownloaded := 0
+	
+	for _, asset := range params.Assets {
+		logging.Info("Scraping SVGs for asset", "asset", asset)
+		
+		// Scrape up to 3 SVGs per asset
+		svgs, err := scrapesvgs.ScrapeSVG(asset, 3)
+		if err != nil {
+			logging.Info("Failed to scrape SVGs for asset", "asset", asset, "error", err)
+			continue
+		}
+		
+		for i, svgContent := range svgs {
+			filename := fmt.Sprintf("%s_%d.svg", strings.ReplaceAll(asset, " ", "_"), i+1)
+			filepath := filepath.Join(publicDir, filename)
+			
+			if err := os.WriteFile(filepath, []byte(svgContent), 0644); err != nil {
+				logging.Info("Failed to write SVG file", "filepath", filepath, "error", err)
+				continue
+			}
+			
+			allFilepaths = append(allFilepaths, filepath)
+			totalDownloaded++
+			logging.Info("Successfully saved SVG", "filepath", filepath)
+		}
+	}
+	
+	if totalDownloaded == 0 {
+		return NewTextErrorResponse("No SVG icons were successfully downloaded"), nil
 	}
 	
 	return WithResponseMetadata(
-		NewTextResponse(fmt.Sprintf("Downloaded %d icons to frontend/public directory", len(params.Assets))),
+		NewTextResponse(fmt.Sprintf("Downloaded %d SVG icons to %s directory", totalDownloaded, publicDir)),
 		LucidIconsResponseMetadata{
-			FilesPaths: filepaths,
+			FilesPaths: allFilepaths,
 		},
 	), nil
 }
