@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -322,8 +324,31 @@ func (a *agent) processGeneration(ctx context.Context, sessionID, content string
 	}
 }
 
+func (a *agent) readTargetFileContent() string {
+	cfg := config.Get()
+	targetPath := filepath.Join(cfg.WorkingDir, config.TargetFilePath)
+	
+	content, err := os.ReadFile(targetPath)
+	if err != nil {
+		logging.Debug("Failed to read target file", "path", targetPath, "error", err)
+		return ""
+	}
+	
+	return string(content)
+}
+
 func (a *agent) createUserMessage(ctx context.Context, sessionID, content string, attachmentParts []message.ContentPart) (message.Message, error) {
 	parts := []message.ContentPart{message.TextContent{Text: content}}
+	
+	// Include current state of target file
+	if targetContent := a.readTargetFileContent(); targetContent != "" {
+		targetPart := message.TextContent{
+			Text: fmt.Sprintf("\n\n--- Current state of %s ---\n%s\n--- End of %s ---", 
+				config.TargetFilePath, targetContent, config.TargetFilePath),
+		}
+		parts = append(parts, targetPart)
+	}
+	
 	parts = append(parts, attachmentParts...)
 	return a.messages.Create(ctx, sessionID, message.CreateMessageParams{
 		Role:  message.User,

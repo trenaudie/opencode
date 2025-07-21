@@ -32,7 +32,7 @@ func OrchestratorAgentTools(
 			// tools.NewGrepTool(),
 			// tools.NewLsTool(),
 			// tools.NewSourcegraphTool(),
-			tools.NewViewTool(lspClients),
+			// tools.NewViewTool(lspClients),
 			// tools.NewPatchTool(lspClients, permissions, history),
 			// tools.NewConfirmWriteTool(lspClients, permissions, history),
 			tools.NewSVGRepoTool(),

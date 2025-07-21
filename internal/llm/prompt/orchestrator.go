@@ -26,8 +26,7 @@ Your core responsibilities are to sequentially perform:
    - Ensure code follows Motion Canvas patterns and conventions
 
 3. VIEWING
-   - You can call the view tool at any time to view the current state of the scene. 
-   - See more details about the view tool below. 
+   - You will be given the CURRENT view of the scene at each call. React accordingly.  
 
 4. COMPLETION: Finalize the animation and end the session
    - Verify the animation works as intended

@@ -266,6 +266,11 @@ func (o *openaiClient) send(ctx context.Context, messages []message.Message, too
 		logging.LogOutput(string(agentName), content, toolCalls)
 
 		// Prepare output data for agent call logging
+		tool_call_names := make([]string, len(toolCalls))
+		for i, call := range toolCalls {
+			tool_call_names[i] = call.Name
+		}
+
 		outputData := map[string]interface{}{
 			"content_length":   len(content),
 			"finish_reason":    string(openaiResponse.Choices[0].FinishReason),
@@ -274,7 +279,8 @@ func (o *openaiClient) send(ctx context.Context, messages []message.Message, too
 		}
 
 		// Log the complete agent call
-		logging.LogAgentCall(string(agentName), "openai_api_call", inputData, outputData)
+		toolCallNamesJSON, _ := json.Marshal(tool_call_names)
+		logging.LogAgentCall(string(agentName), string(toolCallNamesJSON), inputData, outputData)
 
 		return &ProviderResponse{
 			Content:      content,
@@ -366,17 +372,22 @@ func (o *openaiClient) stream(ctx context.Context, messages []message.Message, t
 				// Log output content and tool calls
 				logging.LogOutput(string(agentName), currentContent, toolCalls)
 
-				// Prepare output data for agent call logging (streaming)
+				// Prepare output data for agent call logging
+				tool_call_names := make([]string, len(toolCalls))
+				for i, call := range toolCalls {
+					tool_call_names[i] = call.Name
+				}
+
 				outputData := map[string]interface{}{
 					"content_length":   len(currentContent),
 					"finish_reason":    string(acc.ChatCompletion.Choices[0].FinishReason),
 					"tool_calls_count": len(toolCalls),
 					"usage":            o.usage(acc.ChatCompletion),
-					"streaming":        true,
 				}
 
-				// Log the complete agent call (streaming)
-				logging.LogAgentCall(string(agentName), "openai_streaming_api_call", inputData, outputData)
+				// Log the complete agent call
+				toolCallNamesJSON, _ := json.Marshal(tool_call_names)
+				logging.LogAgentCall(string(agentName), string(toolCallNamesJSON), inputData, outputData)
 
 				eventChan <- ProviderEvent{
 					Type: EventComplete,

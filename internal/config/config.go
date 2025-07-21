@@ -105,6 +105,9 @@ const (
 	appName              = "opencode"
 
 	MaxTokensFallbackDefault = 4096
+	
+	// Target file path for including current state in agent context
+	TargetFilePath = "frontend/src/scenes/example.tsx"
 )
 
 var defaultContextPaths = []string{
