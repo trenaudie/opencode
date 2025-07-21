@@ -105,7 +105,7 @@ const (
 	appName              = "opencode"
 
 	MaxTokensFallbackDefault = 4096
-	
+
 	// Target file path for including current state in agent context
 	TargetFilePath = "frontend/src/scenes/example.tsx"
 )
@@ -349,6 +349,7 @@ func setProviderDefaults() {
 	// copilot configuration
 	if key := viper.GetString("providers.copilot.apiKey"); strings.TrimSpace(key) != "" {
 		viper.SetDefault("agents.coder.model", models.CopilotGPT4o)
+		viper.SetDefault("agents.code-editor.model", models.CopilotGPT4o)
 		viper.SetDefault("agents.orchestrator.model", models.CopilotGPT4o)
 		viper.SetDefault("agents.summarizer.model", models.CopilotGPT4o)
 		viper.SetDefault("agents.task.model", models.CopilotGPT4o)
@@ -359,6 +360,7 @@ func setProviderDefaults() {
 	// Anthropic configuration
 	if key := viper.GetString("providers.anthropic.apiKey"); strings.TrimSpace(key) != "" {
 		viper.SetDefault("agents.coder.model", models.Claude4Sonnet)
+		viper.SetDefault("agents.code-editor.model", models.Claude4Sonnet)
 		viper.SetDefault("agents.orchestrator.model", models.Claude4Sonnet)
 		viper.SetDefault("agents.summarizer.model", models.Claude4Sonnet)
 		viper.SetDefault("agents.task.model", models.Claude4Sonnet)
@@ -370,6 +372,7 @@ func setProviderDefaults() {
 	logging.Debug("Checking OpenAI configuration", "key", viper.GetString("providers.openai.apiKey"))
 	if key := viper.GetString("providers.openai.apiKey"); strings.TrimSpace(key) != "" {
 		viper.SetDefault("agents.coder.model", models.GPT41)
+		viper.SetDefault("agents.code-editor.model", models.GPT41)
 		viper.SetDefault("agents.orchestrator.model", models.GPT41)
 		viper.SetDefault("agents.summarizer.model", models.GPT41)
 		viper.SetDefault("agents.task.model", models.GPT41Mini)
@@ -380,6 +383,7 @@ func setProviderDefaults() {
 	// Google Gemini configuration
 	if key := viper.GetString("providers.gemini.apiKey"); strings.TrimSpace(key) != "" {
 		viper.SetDefault("agents.coder.model", models.Gemini25)
+		viper.SetDefault("agents.code-editor.model", models.Gemini25)
 		viper.SetDefault("agents.orchestrator.model", models.Gemini25)
 		viper.SetDefault("agents.summarizer.model", models.Gemini25)
 		viper.SetDefault("agents.task.model", models.Gemini25Flash)
@@ -390,6 +394,7 @@ func setProviderDefaults() {
 	// Groq configuration
 	if key := viper.GetString("providers.groq.apiKey"); strings.TrimSpace(key) != "" {
 		viper.SetDefault("agents.coder.model", models.QWENQwq)
+		viper.SetDefault("agents.code-editor.model", models.QWENQwq)
 		viper.SetDefault("agents.orchestrator.model", models.QWENQwq)
 		viper.SetDefault("agents.summarizer.model", models.QWENQwq)
 		viper.SetDefault("agents.task.model", models.QWENQwq)
@@ -400,6 +405,7 @@ func setProviderDefaults() {
 	// OpenRouter configuration
 	if key := viper.GetString("providers.openrouter.apiKey"); strings.TrimSpace(key) != "" {
 		viper.SetDefault("agents.coder.model", models.OpenRouterClaude37Sonnet)
+		viper.SetDefault("agents.code-editor.model", models.OpenRouterClaude37Sonnet)
 		viper.SetDefault("agents.orchestrator.model", models.OpenRouterClaude37Sonnet)
 		viper.SetDefault("agents.summarizer.model", models.OpenRouterClaude37Sonnet)
 		viper.SetDefault("agents.task.model", models.OpenRouterClaude37Sonnet)
@@ -410,6 +416,7 @@ func setProviderDefaults() {
 	// XAI configuration
 	if key := viper.GetString("providers.xai.apiKey"); strings.TrimSpace(key) != "" {
 		viper.SetDefault("agents.coder.model", models.XAIGrok3Beta)
+		viper.SetDefault("agents.code-editor.model", models.XAIGrok3Beta)
 		viper.SetDefault("agents.orchestrator.model", models.XAIGrok3Beta)
 		viper.SetDefault("agents.summarizer.model", models.XAIGrok3Beta)
 		viper.SetDefault("agents.task.model", models.XAIGrok3Beta)
@@ -420,6 +427,7 @@ func setProviderDefaults() {
 	// AWS Bedrock configuration
 	if hasAWSCredentials() {
 		viper.SetDefault("agents.coder.model", models.BedrockClaude37Sonnet)
+		viper.SetDefault("agents.code-editor.model", models.BedrockClaude37Sonnet)
 		viper.SetDefault("agents.orchestrator.model", models.BedrockClaude37Sonnet)
 		viper.SetDefault("agents.summarizer.model", models.BedrockClaude37Sonnet)
 		viper.SetDefault("agents.task.model", models.BedrockClaude37Sonnet)
@@ -430,6 +438,7 @@ func setProviderDefaults() {
 	// Azure OpenAI configuration
 	if os.Getenv("AZURE_OPENAI_ENDPOINT") != "" {
 		viper.SetDefault("agents.coder.model", models.AzureGPT41)
+		viper.SetDefault("agents.code-editor.model", models.AzureGPT41)
 		viper.SetDefault("agents.orchestrator.model", models.AzureGPT41)
 		viper.SetDefault("agents.summarizer.model", models.AzureGPT41)
 		viper.SetDefault("agents.task.model", models.AzureGPT41Mini)
@@ -440,6 +449,7 @@ func setProviderDefaults() {
 	// Google Cloud VertexAI configuration
 	if hasVertexAICredentials() {
 		viper.SetDefault("agents.coder.model", models.VertexAIGemini25)
+		viper.SetDefault("agents.code-editor.model", models.VertexAIGemini25)
 		viper.SetDefault("agents.orchestrator.model", models.VertexAIGemini25)
 		viper.SetDefault("agents.summarizer.model", models.VertexAIGemini25)
 		viper.SetDefault("agents.task.model", models.VertexAIGemini25Flash)

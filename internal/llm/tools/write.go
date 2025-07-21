@@ -211,7 +211,7 @@ func (w *writeTool) Run(ctx context.Context, call ToolCall) (ToolResponse, error
 	}
 
 	recordFileWrite(filePath)
-	recordFileRead(filePath)
+	RecordFileRead(filePath)
 	waitForLspDiagnostics(ctx, filePath, w.lspClients)
 
 	result := fmt.Sprintf("File successfully written: %s", filePath)

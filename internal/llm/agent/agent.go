@@ -86,19 +86,20 @@ func NewAgent(
 	}
 	var titleProvider provider.Provider
 	// Only generate titles for the coder agent
-	if agentName == config.AgentOrchestrator {
-		titleProvider, err = createAgentProvider(config.AgentTitle)
-		if err != nil {
-			return nil, err
-		}
-	}
+	// if agentName == config.AgentOrchestrator {
+	// 	titleProvider, err = createAgentProvider(config.AgentTitle)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
 	var summarizeProvider provider.Provider
-	if agentName == config.AgentOrchestrator {
-		summarizeProvider, err = createAgentProvider(config.AgentSummarizer)
-		if err != nil {
-			return nil, err
-		}
-	}
+	// if agentName == config.AgentOrchestrator {
+	// 	summarizeProvider, err = createAgentProvider(config.AgentSummarizer)
+	// 	if err != nil {
+	// 		return nil, err
+	// 	}
+	// }
+
 	logging.Info("creating an agent with name and tools...", "agentName", agentName, "toolCount", len(agentTools))
 
 	for index, tool := range agentTools {
@@ -327,28 +328,31 @@ func (a *agent) processGeneration(ctx context.Context, sessionID, content string
 func (a *agent) readTargetFileContent() string {
 	cfg := config.Get()
 	targetPath := filepath.Join(cfg.WorkingDir, config.TargetFilePath)
-	
+
 	content, err := os.ReadFile(targetPath)
 	if err != nil {
 		logging.Debug("Failed to read target file", "path", targetPath, "error", err)
 		return ""
 	}
-	
+
+	// Record that we read this file to prevent edit tool from crashing
+	tools.RecordFileRead(targetPath)
+
 	return string(content)
 }
 
 func (a *agent) createUserMessage(ctx context.Context, sessionID, content string, attachmentParts []message.ContentPart) (message.Message, error) {
 	parts := []message.ContentPart{message.TextContent{Text: content}}
-	
+
 	// Include current state of target file
 	if targetContent := a.readTargetFileContent(); targetContent != "" {
 		targetPart := message.TextContent{
-			Text: fmt.Sprintf("\n\n--- Current state of %s ---\n%s\n--- End of %s ---", 
+			Text: fmt.Sprintf("\n\n--- Current state of %s ---\n%s\n--- End of %s ---",
 				config.TargetFilePath, targetContent, config.TargetFilePath),
 		}
 		parts = append(parts, targetPart)
 	}
-	
+
 	parts = append(parts, attachmentParts...)
 	return a.messages.Create(ctx, sessionID, message.CreateMessageParams{
 		Role:  message.User,
@@ -383,7 +387,7 @@ func (a *agent) streamAndHandleEvents(ctx context.Context, sessionID string, msg
 			return assistantMsg, nil, ctx.Err()
 		}
 	}
-
+	logging.Info("Just received streaming response from agent")
 	toolResults := make([]message.ToolResult, len(assistantMsg.ToolCalls()))
 	toolCalls := assistantMsg.ToolCalls()
 	for i, toolCall := range toolCalls {

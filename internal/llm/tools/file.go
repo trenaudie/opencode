@@ -17,7 +17,7 @@ var (
 	fileRecordMutex sync.RWMutex
 )
 
-func recordFileRead(path string) {
+func RecordFileRead(path string) {
 	fileRecordMutex.Lock()
 	defer fileRecordMutex.Unlock()
 

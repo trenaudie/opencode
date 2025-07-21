@@ -199,7 +199,7 @@ func (v *viewTool) Run(ctx context.Context, call ToolCall) (ToolResponse, error)
 	output += getDiagnostics(filePath, v.lspClients)
 	logging.Debug("view tool getDiagnostics completed successfully", "file_path", filePath)
 
-	recordFileRead(filePath)
+	RecordFileRead(filePath)
 	logging.Debug("view tool completed successfully", "file_path", filePath)
 	return WithResponseMetadata(
 		NewTextResponse(output),

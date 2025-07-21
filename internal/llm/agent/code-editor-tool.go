@@ -3,12 +3,14 @@ package agent
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/opencode-ai/opencode/internal/config"
 	"github.com/opencode-ai/opencode/internal/llm/tools"
+	"github.com/opencode-ai/opencode/internal/logging"
 	"github.com/opencode-ai/opencode/internal/lsp"
 	"github.com/opencode-ai/opencode/internal/message"
 	"github.com/opencode-ai/opencode/internal/permission"
@@ -64,6 +66,9 @@ func (c *codeEditorAgentTool) Info() tools.ToolInfo {
 }
 
 func (c *codeEditorAgentTool) Run(ctx context.Context, call tools.ToolCall) (tools.ToolResponse, error) {
+	// Create a cancellable context specifically for debugging this agent
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel() // Ensure cleanup
 	var params CodeEditorAgentParams
 	if err := json.Unmarshal([]byte(call.Input), &params); err != nil {
 		return tools.NewTextErrorResponse(fmt.Sprintf("error parsing parameters: %s", err)), nil
@@ -83,19 +88,25 @@ func (c *codeEditorAgentTool) Run(ctx context.Context, call tools.ToolCall) (too
 	// and don't need persistent history tracking
 	agent, err := NewAgent(config.AgentCodeEditor, c.sessions, c.messages, CodeEditorAgentTools(permissions, nil, c.lspClients))
 	if err != nil {
-		return tools.ToolResponse{}, fmt.Errorf("error creating code-editor agent: %s", err)
+		logging.Error("Failed to create code-editor agent", "error", err)
+		// raise error
+		return tools.ToolResponse{}, errors.New("cannot divide by zero")
+
 	}
 
 	session, err := c.sessions.CreateTaskSession(ctx, call.ID, sessionID, "CodeEditor Agent Session")
 	if err != nil {
+		logging.Error("Failed to create session for code-editor agent", "session_id", sessionID, "error", err)
 		return tools.ToolResponse{}, fmt.Errorf("error creating session: %s", err)
 	}
 
 	filePath := filepath.Join(config.WorkingDirectory(), "frontend/src/scenes/example.tsx")
 	currentScene, err := os.ReadFile(filePath)
 	if err != nil {
+		logging.Error("Failed to read file", "file_path", filePath, "error", err)
 		return tools.ToolResponse{}, fmt.Errorf("error reading file: %s", err)
 	}
+	logging.Info("CodeEditorAgentTool calling Run on agent")
 	done, err := agent.Run(ctx, session.ID, params.Prompt+"\n\nCurrent file (called example.tsx):\n"+string(currentScene))
 	if err != nil {
 		return tools.ToolResponse{}, fmt.Errorf("error running code-editor agent: %s", err)
@@ -125,7 +136,46 @@ func (c *codeEditorAgentTool) Run(ctx context.Context, call tools.ToolCall) (too
 	if err != nil {
 		return tools.ToolResponse{}, fmt.Errorf("error saving parent session: %s", err)
 	}
-	return tools.NewTextResponse(response.Content().String()), nil
+
+	// Get all messages from the agent session to collect tool results
+	messages, err := c.messages.List(ctx, session.ID)
+	if err != nil {
+		return tools.ToolResponse{}, fmt.Errorf("error listing messages from agent session: %s", err)
+	}
+
+	// Collect all tool results from the session
+	logging.Info("CodeEditorAgentTool collected messages", "count", len(messages))
+	for _, msg := range messages {
+		if msg.Role == message.Tool {
+			logging.Info("CodeEditorAgentTool message", "id", msg.ID, "role", msg.Role, "content", msg.Content)
+		}
+	}
+	var toolResults []message.ToolResult
+	for _, msg := range messages {
+		if msg.Role == message.Tool {
+			toolResults = append(toolResults, msg.ToolResults()...)
+		}
+	}
+
+	// Combine assistant response with tool results
+	responseText := response.Content().String()
+	if len(toolResults) > 0 {
+		responseText += "\n\nTool Results:\n"
+		for _, tr := range toolResults {
+			if tr.IsError {
+				responseText += fmt.Sprintf("❌ Error: %s\n", tr.Content)
+			} else {
+				responseText += fmt.Sprintf("✅ %s\n", tr.Content)
+			}
+		}
+	}
+	logging.LogToolOutput("CodeEditorAgentTool response", responseText)
+
+	// Cancel context to signal completion and end main test loop
+	logging.Info("Cancelling because we are debugging the code editor agent")
+	cancel()
+
+	return tools.NewTextResponse(responseText), nil
 }
 
 func NewCodeEditorAgentTool(

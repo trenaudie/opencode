@@ -342,7 +342,7 @@ func (p *patchTool) Run(ctx context.Context, call ToolCall) (ToolResponse, error
 
 		// Record file operations
 		recordFileWrite(absPath)
-		recordFileRead(absPath)
+		RecordFileRead(absPath)
 	}
 
 	// Run LSP diagnostics on all changed files

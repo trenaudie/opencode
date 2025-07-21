@@ -238,7 +238,7 @@ func (e *editTool) createNewFile(ctx context.Context, filePath, content string) 
 	}
 
 	recordFileWrite(filePath)
-	recordFileRead(filePath)
+	RecordFileRead(filePath)
 
 	return WithResponseMetadata(
 		NewTextResponse("File created: "+filePath),
@@ -357,7 +357,7 @@ func (e *editTool) deleteContent(ctx context.Context, filePath, oldString string
 	}
 
 	recordFileWrite(filePath)
-	recordFileRead(filePath)
+	RecordFileRead(filePath)
 
 	return WithResponseMetadata(
 		NewTextResponse("Content deleted from file: "+filePath),
@@ -477,7 +477,7 @@ func (e *editTool) replaceContent(ctx context.Context, filePath, oldString, newS
 	}
 
 	recordFileWrite(filePath)
-	recordFileRead(filePath)
+	RecordFileRead(filePath)
 
 	return WithResponseMetadata(
 		NewTextResponse("Content replaced in file: "+filePath),

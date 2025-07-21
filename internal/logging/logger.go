@@ -82,29 +82,35 @@ func logToGlobalFile(level, msg string, args ...any) {
 }
 
 func getCaller() string {
-	if pc, file, line, ok := runtime.Caller(2); ok {
-		fn := runtime.FuncForPC(pc)
-		funcName := ""
-		if fn != nil {
-			funcName = fn.Name()
+	var trace []string
+	for i := 2; i <= 5; i++ {
+		if pc, file, line, ok := runtime.Caller(i); ok {
+			fn := runtime.FuncForPC(pc)
+			funcName := ""
+			if fn != nil {
+				funcName = fn.Name()
+			}
+			trace = append(trace, fmt.Sprintf("%s:%d (%s)", file, line, funcName))
+		} else {
+			break
 		}
-		return fmt.Sprintf("%s:%d (%s)", file, line, funcName)
+	}
+	if len(trace) > 0 {
+		return fmt.Sprintf("%s", trace[0])
 	}
 	return "unknown"
 }
 func Info(msg string, args ...any) {
 	source := getCaller()
-	nycTime := getNYCTime().Format("2006-01-02 15:04:05 MST")
-	slog.Info(msg, append([]any{"source", source, "location", source, "nyc_time", nycTime}, args...)...)
-	msg_with_source := fmt.Sprintf("%s [source: %s]", msg, source)
+	// nycTime := getNYCTime().Format("2006-01-02 15:04:05 MST")
+	// slog.Info(append([]any{"source", source, msg}, args...))
+	msg_with_source := fmt.Sprintf("[%s] %s", source, msg)
 	logToGlobalFile("INFO", msg_with_source, args...)
 }
 
 func Debug(msg string, args ...any) {
 	source := getCaller()
-	nycTime := getNYCTime().Format("2006-01-02 15:04:05 MST")
-	slog.Debug(msg, append([]any{"source", source, "nyc_time", nycTime}, args...)...)
-	logToGlobalFile("DEBUG", msg, args...)
+	logToGlobalFile("DEBUG", fmt.Sprintf("[%s] %s", source, msg), args...)
 }
 
 func Warn(msg string, args ...any) {
