@@ -38,6 +38,7 @@ type AgentName string
 
 const (
 	AgentCoder        AgentName = "coder"
+	AgentCodeEditor   AgentName = "code-editor"
 	AgentOrchestrator AgentName = "orchestrator"
 	AgentSummarizer   AgentName = "summarizer"
 	AgentTask         AgentName = "task"

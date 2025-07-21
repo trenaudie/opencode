@@ -84,14 +84,14 @@ func NewAgent(
 	}
 	var titleProvider provider.Provider
 	// Only generate titles for the coder agent
-	if agentName == config.AgentCoder {
+	if agentName == config.AgentOrchestrator {
 		titleProvider, err = createAgentProvider(config.AgentTitle)
 		if err != nil {
 			return nil, err
 		}
 	}
 	var summarizeProvider provider.Provider
-	if agentName == config.AgentCoder {
+	if agentName == config.AgentOrchestrator {
 		summarizeProvider, err = createAgentProvider(config.AgentSummarizer)
 		if err != nil {
 			return nil, err

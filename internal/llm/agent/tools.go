@@ -26,7 +26,7 @@ func OrchestratorAgentTools(
 	return append(
 		[]tools.BaseTool{
 			// tools.NewBashTool(permissions),
-			tools.NewEditTool(lspClients, permissions, history),
+			// tools.NewEditTool(lspClients, permissions, history),
 			// tools.NewFetchTool(permissions),
 			// tools.NewGlobTool(),
 			// tools.NewGrepTool(),
@@ -34,7 +34,7 @@ func OrchestratorAgentTools(
 			// tools.NewSourcegraphTool(),
 			tools.NewViewTool(lspClients),
 			// tools.NewPatchTool(lspClients, permissions, history),
-			tools.NewWriteTool(lspClients, permissions, history),
+			tools.NewConfirmWriteTool(lspClients, permissions, history),
 			tools.NewSVGRepoTool(),
 			// NewAgentTool(sessions, messages, lspClients),
 			NewCoderAgentTool(sessions, messages, lspClients),
@@ -50,9 +50,21 @@ func CoderAgentTools(
 	history history.Service,
 	lspClients map[string]*lsp.Client,
 ) []tools.BaseTool {
-	return []tools.BaseTool{}
+	return []tools.BaseTool{
+		tools.NewWriteTool(lspClients, permissions, history),
+	}
 }
-
+func CodeEditorAgentTools(
+	permissions permission.Service,
+	sessions session.Service,
+	messages message.Service,
+	history history.Service,
+	lspClients map[string]*lsp.Client,
+) []tools.BaseTool {
+	return []tools.BaseTool{
+		tools.NewEditTool(lspClients, permissions, history),
+	}
+}
 func TaskAgentTools(lspClients map[string]*lsp.Client) []tools.BaseTool {
 	return []tools.BaseTool{
 		tools.NewGlobTool(),

@@ -36,9 +36,10 @@ To use this tool you MUST provide a JSON specification, and provide a very detai
 HOW TO USE THIS TOOL:
 - Provide a detailed JSON specification for creating a new Motion Canvas scene from scratch
 - The SPEC FORMAT may be loosely followed, and you can add comments into, as your tool call will be parsed as text and sent to the coder agent. 
-= The SPEC FORMAT that you will be given gives you many fields, but these are optional. Only add a field in the spec that you provide to the coder agent if you have a non-null string value for it that you specifically want.
+- The SPEC FORMAT that you will be given gives you many fields, but these are optional. Only add a field in the spec that you provide to the coder agent if you have a non-null string value for it that you specifically want.
 - Include all necessary information for the agent to generate the complete scene
 - You can invent names of functions or attributes if you do not know them, but in that case add a comment to the spec, so that the agent can understand that you are unsure about the real name of the function or attribute.
+- The Coder Agent tool will probably try to write to the file example.tsx, as it has access to the Write tool as well. So you must react accordingly to the coder agent's feedback on its generation of code and tool calling. 
 `
 
 func (c *coderAgentTool) Info() tools.ToolInfo {

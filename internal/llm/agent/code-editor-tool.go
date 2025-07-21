@@ -21,7 +21,7 @@ type codeEditorAgentTool struct {
 }
 
 const (
-	CodeEditorAgentToolName = "coder"
+	CodeEditorAgentToolName = "code_editor"
 )
 
 type CodeEditorAgentParams struct {
@@ -51,7 +51,7 @@ func (c *codeEditorAgentTool) Info() tools.ToolInfo {
 		Parameters: map[string]any{
 			"prompt": map[string]any{
 				"type":        "string",
-				"description": "The coding task for the coder agent to perform, such as creating a specific Motion Canvas animation or component",
+				"description": "The coding task for the code editor agent to perform, such as removing this or replacing that line of the example.tsx file",
 			},
 			// "code_to_modify": map[string]any{
 			// 	"type":        "string",
@@ -77,12 +77,12 @@ func (c *codeEditorAgentTool) Run(ctx context.Context, call tools.ToolCall) (too
 	}
 
 	// Create coder agent with no tools (empty tools slice)
-	agent, err := NewAgent(config.AgentCoder, c.sessions, c.messages, []tools.BaseTool{})
+	agent, err := NewAgent(config.AgentCodeEditor, c.sessions, c.messages, []tools.BaseTool{})
 	if err != nil {
-		return tools.ToolResponse{}, fmt.Errorf("error creating coder agent: %s", err)
+		return tools.ToolResponse{}, fmt.Errorf("error creating code-editor agent: %s", err)
 	}
 
-	session, err := c.sessions.CreateTaskSession(ctx, call.ID, sessionID, "Coder Agent Session")
+	session, err := c.sessions.CreateTaskSession(ctx, call.ID, sessionID, "CodeEditor Agent Session")
 	if err != nil {
 		return tools.ToolResponse{}, fmt.Errorf("error creating session: %s", err)
 	}
@@ -94,16 +94,16 @@ func (c *codeEditorAgentTool) Run(ctx context.Context, call tools.ToolCall) (too
 	}
 	done, err := agent.Run(ctx, session.ID, params.Prompt+"\n\nCurrent file (called example.tsx):\n"+string(currentScene))
 	if err != nil {
-		return tools.ToolResponse{}, fmt.Errorf("error running coder agent: %s", err)
+		return tools.ToolResponse{}, fmt.Errorf("error running code-editor agent: %s", err)
 	}
 	result := <-done
 	if result.Error != nil {
-		return tools.ToolResponse{}, fmt.Errorf("error from coder agent: %s", result.Error)
+		return tools.ToolResponse{}, fmt.Errorf("error from code-editor agent: %s", result.Error)
 	}
 
 	response := result.Message
 	if response.Role != message.Assistant {
-		return tools.NewTextErrorResponse("no response from coder agent"), nil
+		return tools.NewTextErrorResponse("no response from code-editor agent"), nil
 	}
 
 	updatedSession, err := c.sessions.Get(ctx, session.ID)
