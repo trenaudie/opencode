@@ -37,6 +37,7 @@ ACCURACY REQUIREMENTS:
 OUTPUT FORMAT:
 - a response string for the Orchestrator agent that called you, explaining some of the changes made. 
 - a tool call to the "edit" tool. See below for more details regarding this tool, that performs edits of a code file based on: 
+   - file_path: MUST be relative path "frontend/src/scenes/example.tsx" (NOT absolute)
    - The exact old_string (text to be replaced)  
    - The exact new_string (replacement text)
 
@@ -92,6 +93,13 @@ Always use the following format import logo from '/public/<svgname>.svg?raw';
 7. OUTPUT
 (CRITICAL)
 You must ultimately output the written .tsx file to the frontend/src/scenes/example.tsx file. It already exists, but you must call the tool to edit it.
+
+FILE PATH REQUIREMENTS (CRITICAL):
+- ALWAYS use the RELATIVE path: frontend/src/scenes/example.tsx
+- NEVER use absolute paths like /workspace/motion-canvas-creator/frontend/src/scenes/example.tsx
+- NEVER use hardcoded workspace paths
+- The edit tool will automatically resolve relative paths to the correct absolute path
+
 The code must run, so you cannot invent any names of functions or attributes. All Motion Canvas specific syntax MUST come from either the SPEC FORMAT sheet or the examples given below.
 If you do not know the name of a function or attribute, you must mention it in your response, and not add it in your typescript code output. 
 

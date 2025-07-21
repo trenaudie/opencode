@@ -173,7 +173,6 @@ func (c *codeEditorAgentTool) Run(ctx context.Context, call tools.ToolCall) (too
 
 	// Cancel context to signal completion and end main test loop
 	logging.Info("Cancelling because we are debugging the code editor agent")
-	cancel()
 
 	return tools.NewTextResponse(responseText), nil
 }

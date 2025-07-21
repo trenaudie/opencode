@@ -655,7 +655,7 @@ func (w *WorkspaceWatcher) handleFileEvent(ctx context.Context, uri string, chan
 
 	// Notify LSP server about the file event using didChangeWatchedFiles
 	if err := w.notifyFileEvent(ctx, uri, changeType); err != nil {
-		logging.Error("Error notifying LSP server about file event", "error", err)
+		// logging.Error("Error notifying LSP server about file event", "error", err)
 	}
 }
 
