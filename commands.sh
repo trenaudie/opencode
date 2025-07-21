@@ -1,0 +1,1 @@
+  go test -run TestIntegrationAgentSession -args "Can you edit the current scene in the example.tsx file. I would like you to add an svg of France to the top of the page." -v
