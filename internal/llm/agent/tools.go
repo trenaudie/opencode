@@ -45,8 +45,6 @@ func OrchestratorAgentTools(
 
 func CoderAgentTools(
 	permissions permission.Service,
-	sessions session.Service,
-	messages message.Service,
 	history history.Service,
 	lspClients map[string]*lsp.Client,
 ) []tools.BaseTool {
@@ -56,8 +54,6 @@ func CoderAgentTools(
 }
 func CodeEditorAgentTools(
 	permissions permission.Service,
-	sessions session.Service,
-	messages message.Service,
 	history history.Service,
 	lspClients map[string]*lsp.Client,
 ) []tools.BaseTool {

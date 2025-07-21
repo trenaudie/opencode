@@ -11,6 +11,7 @@ import (
 	"github.com/opencode-ai/opencode/internal/llm/tools"
 	"github.com/opencode-ai/opencode/internal/lsp"
 	"github.com/opencode-ai/opencode/internal/message"
+	"github.com/opencode-ai/opencode/internal/permission"
 	"github.com/opencode-ai/opencode/internal/session"
 )
 
@@ -74,8 +75,11 @@ func (c *coderAgentTool) Run(ctx context.Context, call tools.ToolCall) (tools.To
 		return tools.ToolResponse{}, fmt.Errorf("session_id and message_id are required")
 	}
 
-	// Create coder agent with no tools (empty tools slice)
-	agent, err := NewAgent(config.AgentCoder, c.sessions, c.messages, []tools.BaseTool{})
+	// Create coder agent with write tools
+	permissions := permission.NewPermissionService()
+	// For the history service, we'll pass nil since these agents run in isolated sessions
+	// and don't need persistent history tracking
+	agent, err := NewAgent(config.AgentCoder, c.sessions, c.messages, CoderAgentTools(permissions, nil, c.lspClients))
 	if err != nil {
 		return tools.ToolResponse{}, fmt.Errorf("error creating coder agent: %s", err)
 	}

@@ -97,7 +97,17 @@ func NewAgent(
 			return nil, err
 		}
 	}
+	logging.Info("creating an agent with name and tools...", "agentName", agentName, "toolCount", len(agentTools))
 
+	for index, tool := range agentTools {
+		var name string
+		if agentTools[index].Info().Name != "" {
+			name = agentTools[index].Info().Name
+		} else {
+			name = fmt.Sprintf("tool_%d", index)
+		}
+		logging.LogToolInfo(name, tool.Info())
+	}
 	agent := &agent{
 		Broker:            pubsub.NewBroker[AgentEvent](),
 		provider:          agentProvider,
@@ -323,17 +333,6 @@ func (a *agent) createUserMessage(ctx context.Context, sessionID, content string
 
 func (a *agent) streamAndHandleEvents(ctx context.Context, sessionID string, msgHistory []message.Message) (message.Message, *message.Message, error) {
 	ctx = context.WithValue(ctx, tools.SessionIDContextKey, sessionID)
-	logging.Info("adding tools to the call using ", "tool_count", len(a.tools))
-
-	for index, tool := range a.tools {
-		var name string
-		if a.tools[index].Info().Name != "" {
-			name = a.tools[index].Info().Name
-		} else {
-			name = fmt.Sprintf("tool_%d", index)
-		}
-		logging.LogToolInfo(name, tool.Info())
-	}
 	eventChan := a.provider.StreamResponse(ctx, msgHistory, a.tools)
 
 	assistantMsg, err := a.messages.Create(ctx, sessionID, message.CreateMessageParams{

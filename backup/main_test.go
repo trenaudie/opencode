@@ -16,6 +16,21 @@ import (
 	"github.com/opencode-ai/opencode/internal/logging"
 )
 
+// WebSocket message structure for testing
+type WebSocketMessage struct {
+	Type      string `json:"type"`
+	SessionID string `json:"session_id,omitempty"`
+	Content   string `json:"content,omitempty"`
+	Error     string `json:"error,omitempty"`
+}
+
+// WebSocket upgrader for testing
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true // Allow all origins for testing
+	},
+}
+
 func TestRootEndpoint(t *testing.T) {
 	// Initialize logging for tests
 	logging.InitGlobalLogging("test.log")

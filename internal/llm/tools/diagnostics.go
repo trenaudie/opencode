@@ -258,16 +258,16 @@ func getDiagnostics(filePath string, lsps map[string]*lsp.Client) string {
 		output += "\n</file_diagnostics>\n"
 	}
 
-	if len(projectDiagnostics) > 0 {
-		output += "\n<project_diagnostics>\n"
-		if len(projectDiagnostics) > 10 {
-			output += strings.Join(projectDiagnostics[:10], "\n")
-			output += fmt.Sprintf("\n... and %d more diagnostics", len(projectDiagnostics)-10)
-		} else {
-			output += strings.Join(projectDiagnostics, "\n")
-		}
-		output += "\n</project_diagnostics>\n"
-	}
+	// if len(projectDiagnostics) > 0 {
+	// 	output += "\n<project_diagnostics>\n"
+	// 	if len(projectDiagnostics) > 10 {
+	// 		output += strings.Join(projectDiagnostics[:10], "\n")
+	// 		output += fmt.Sprintf("\n... and %d more diagnostics", len(projectDiagnostics)-10)
+	// 	} else {
+	// 		output += strings.Join(projectDiagnostics, "\n")
+	// 	}
+	// 	output += "\n</project_diagnostics>\n"
+	// }
 
 	if len(fileDiagnostics) > 0 || len(projectDiagnostics) > 0 {
 		fileErrors := countSeverity(fileDiagnostics, "Error")
