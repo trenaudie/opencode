@@ -20,6 +20,8 @@ func GetAgentPrompt(agentName config.AgentName, provider models.ModelProvider) s
 		basePrompt = OrchestratorPrompt()
 	case config.AgentCoder:
 		basePrompt = CoderPrompt(provider)
+	case config.AgentCodeEditor:
+		basePrompt = CodeEditorPrompt(provider)
 	case config.AgentTitle:
 		basePrompt = TitlePrompt(provider)
 	case config.AgentTask:

@@ -12,7 +12,7 @@ func CoderPrompt(provider models.ModelProvider) string {
 	// case models.ProviderOpenAI:
 	// 	basePrompt = baseOpenAICoderPrompt
 	// }
-	return fmt.Sprintf("%s\n\n%s\n%s", basePrompt)
+	return fmt.Sprintf("%s", basePrompt)
 }
 
 const MotionCanvasSpecificCoderPrompt = `

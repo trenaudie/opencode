@@ -34,7 +34,7 @@ func OrchestratorAgentTools(
 			// tools.NewSourcegraphTool(),
 			tools.NewViewTool(lspClients),
 			// tools.NewPatchTool(lspClients, permissions, history),
-			tools.NewConfirmWriteTool(lspClients, permissions, history),
+			// tools.NewConfirmWriteTool(lspClients, permissions, history),
 			tools.NewSVGRepoTool(),
 			// NewAgentTool(sessions, messages, lspClients),
 			NewCoderAgentTool(sessions, messages, lspClients),

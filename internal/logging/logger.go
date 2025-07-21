@@ -17,6 +17,15 @@ import (
 var globalLogFile *os.File
 var globalLogMutex sync.Mutex
 
+// getNYCTime returns the current time in NYC timezone
+func getNYCTime() time.Time {
+	nycTz, err := time.LoadLocation("America/New_York")
+	if err != nil {
+		return time.Now().UTC() // fallback to UTC if NYC timezone fails to load
+	}
+	return time.Now().In(nycTz)
+}
+
 // InitGlobalLogging initializes global logging to the specified file
 func InitGlobalLogging(logFilePath string) error {
 	globalLogMutex.Lock()
@@ -52,7 +61,7 @@ func logToGlobalFile(level, msg string, args ...any) {
 	globalLogMutex.Lock()
 	defer globalLogMutex.Unlock()
 
-	timestamp := time.Now().Format("2006-01-02 15:04:05")
+	timestamp := getNYCTime().Format("2006-01-02 15:04:05 MST")
 	logLine := fmt.Sprintf("[%s] %s: %s", timestamp, level, msg)
 
 	// Add args if present
@@ -85,45 +94,52 @@ func getCaller() string {
 }
 func Info(msg string, args ...any) {
 	source := getCaller()
-	slog.Info(msg, append([]any{"source", source, "location", source}, args...)...)
+	nycTime := getNYCTime().Format("2006-01-02 15:04:05 MST")
+	slog.Info(msg, append([]any{"source", source, "location", source, "nyc_time", nycTime}, args...)...)
 	msg_with_source := fmt.Sprintf("%s [source: %s]", msg, source)
 	logToGlobalFile("INFO", msg_with_source, args...)
 }
 
 func Debug(msg string, args ...any) {
-	// slog.Debug(msg, args...)
 	source := getCaller()
-	slog.Debug(msg, append([]any{"source", source}, args...)...)
+	nycTime := getNYCTime().Format("2006-01-02 15:04:05 MST")
+	slog.Debug(msg, append([]any{"source", source, "nyc_time", nycTime}, args...)...)
 	logToGlobalFile("DEBUG", msg, args...)
 }
 
 func Warn(msg string, args ...any) {
-	slog.Warn(msg, args...)
+	nycTime := getNYCTime().Format("2006-01-02 15:04:05 MST")
+	slog.Warn(msg, append([]any{"nyc_time", nycTime}, args...)...)
 	logToGlobalFile("WARN", msg, args...)
 }
 
 func Error(msg string, args ...any) {
-	slog.Error(msg, args...)
+	nycTime := getNYCTime().Format("2006-01-02 15:04:05 MST")
+	slog.Error(msg, append([]any{"nyc_time", nycTime}, args...)...)
 	logToGlobalFile("ERROR", msg, args...)
 }
 
 func InfoPersist(msg string, args ...any) {
-	args = append(args, persistKeyArg, true)
+	nycTime := getNYCTime().Format("2006-01-02 15:04:05 MST")
+	args = append(args, persistKeyArg, true, "nyc_time", nycTime)
 	slog.Info(msg, args...)
 }
 
 func DebugPersist(msg string, args ...any) {
-	args = append(args, persistKeyArg, true)
+	nycTime := getNYCTime().Format("2006-01-02 15:04:05 MST")
+	args = append(args, persistKeyArg, true, "nyc_time", nycTime)
 	slog.Debug(msg, args...)
 }
 
 func WarnPersist(msg string, args ...any) {
-	args = append(args, persistKeyArg, true)
+	nycTime := getNYCTime().Format("2006-01-02 15:04:05 MST")
+	args = append(args, persistKeyArg, true, "nyc_time", nycTime)
 	slog.Warn(msg, args...)
 }
 
 func ErrorPersist(msg string, args ...any) {
-	args = append(args, persistKeyArg, true)
+	nycTime := getNYCTime().Format("2006-01-02 15:04:05 MST")
+	args = append(args, persistKeyArg, true, "nyc_time", nycTime)
 	slog.Error(msg, args...)
 }
 
@@ -136,7 +152,8 @@ func RecoverPanic(name string, cleanup func()) {
 		ErrorPersist(fmt.Sprintf("Panic in %s: %v", name, r))
 
 		// Create a timestamped panic log file
-		timestamp := time.Now().Format("20060102-150405")
+		nycTime := getNYCTime()
+		timestamp := nycTime.Format("20060102-150405")
 		filename := fmt.Sprintf("opencode-panic-%s-%s.log", name, timestamp)
 
 		file, err := os.Create(filename)
@@ -147,7 +164,7 @@ func RecoverPanic(name string, cleanup func()) {
 
 			// Write panic information and stack trace
 			fmt.Fprintf(file, "Panic in %s: %v\n\n", name, r)
-			fmt.Fprintf(file, "Time: %s\n\n", time.Now().Format(time.RFC3339))
+			fmt.Fprintf(file, "Time (NYC): %s\n\n", nycTime.Format(time.RFC3339))
 			fmt.Fprintf(file, "Stack Trace:\n%s\n", debug.Stack())
 
 			InfoPersist(fmt.Sprintf("Panic details written to %s", filename))

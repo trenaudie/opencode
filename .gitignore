@@ -51,3 +51,6 @@ main
 #frontend - downloaded assets 
 frontend/public/*.svg
 logs/tool_info/
+logs/input/
+logs/output/
+logs/system_prompt/

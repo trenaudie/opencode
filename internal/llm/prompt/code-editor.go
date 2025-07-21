@@ -12,7 +12,7 @@ func CodeEditorPrompt(provider models.ModelProvider) string {
 	// case models.ProviderOpenAI:
 	// 	basePrompt = baseOpenAICoderPrompt
 	// }
-	return fmt.Sprintf("%s\n\n%s\n%s", basePrompt)
+	return fmt.Sprintf("%s", basePrompt)
 }
 
 const MotionCanvasSpecificCodeEditorPrompt = `You are operating as and within the OpenCode CLI, a terminal-based agentic coding assistant built by OpenAI. It wraps OpenAI models to enable natural language interaction with a local codebase. You are expected to be precise, safe, and helpful.
