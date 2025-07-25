@@ -89,6 +89,9 @@ func (c *coderAgentTool) Run(ctx context.Context, call tools.ToolCall) (tools.To
 		return tools.ToolResponse{}, fmt.Errorf("error creating session: %s", err)
 	}
 
+	// Auto-approve permissions for the coder agent session
+	permissions.AutoApproveSession(session.ID)
+
 	filePath := filepath.Join(config.WorkingDirectory(), "frontend/src/scenes/example.tsx")
 	currentScene, err := os.ReadFile(filePath)
 	if err != nil {
@@ -123,7 +126,14 @@ func (c *coderAgentTool) Run(ctx context.Context, call tools.ToolCall) (tools.To
 	if err != nil {
 		return tools.ToolResponse{}, fmt.Errorf("error saving parent session: %s", err)
 	}
-	return tools.NewTextResponse(response.Content().String()), nil
+	var textResponse string
+	textResponse += fmt.Sprintf("Coder Agent response:\n%s\n", response.Content().String())
+	toolcalls := response.ToolCalls()
+	for _, toolCall := range toolcalls {
+		var add_string = fmt.Sprintf("Code Agent successfully made a call to the tool %s with params %s", toolCall.Name, toolCall.Input)
+		textResponse += add_string + "\n"
+	}
+	return tools.NewTextResponse(textResponse), nil
 }
 
 func NewCoderAgentTool(

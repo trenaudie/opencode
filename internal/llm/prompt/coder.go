@@ -77,8 +77,8 @@ If you do not know the name of a function or attribute, you must mention it in y
 
 8. OUTPUT
 (CRITICAL)
-You must ultimately output two things:
-- a text response explaining the code generation.
+You must ultimately output just the tool call, with the typescript code. Therefore:
+- NO TEXT RESPONSE explaining your code. 
 - a tool call to the "write" tool with
   - the written .tsx file content in direct typescript code (no markdown formatting or quotation brackets)
   - a file_path which MUST be 'frontend/src/scenes/example.tsx'.

@@ -100,6 +100,9 @@ func (c *codeEditorAgentTool) Run(ctx context.Context, call tools.ToolCall) (too
 		return tools.ToolResponse{}, fmt.Errorf("error creating session: %s", err)
 	}
 
+	// Auto-approve permissions for the code editor agent session
+	permissions.AutoApproveSession(session.ID)
+
 	filePath := filepath.Join(config.WorkingDirectory(), "frontend/src/scenes/example.tsx")
 	currentScene, err := os.ReadFile(filePath)
 	if err != nil {
